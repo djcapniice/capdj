@@ -147,7 +147,8 @@
   .tuile.moitie { grid-column: span 3; }
   .tuile .t { font-size: 24px; line-height: 1.17; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
   .tuile p { margin: 0; color: var(--doux); font-size: 16px; }
-  .compteur { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -0.05em; margin: 0 0 10px; font-variant-numeric: tabular-nums;
+  .tuile .t { color: var(--texte); }
+  .tuile .compteur { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -0.05em; margin: 0 0 10px; font-variant-numeric: tabular-nums;
               background: linear-gradient(135deg, #ff3b30, #ffd60a 35%, #30d158 55%, #64d2ff 75%, #5e5ce6); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .pastilles { display: flex; gap: 7px; margin-top: 18px; }
   .pastilles i { width: 16px; height: 16px; border-radius: 5px; opacity: 0; transform: scale(.4); transition: opacity .4s, transform .4s cubic-bezier(.3,1.6,.5,1); }
@@ -221,7 +222,7 @@
     .touche { min-width: 40px; height: 40px; font-size: 16px; }
     .tuiles { grid-template-columns: 1fr; }
     .tuile, .tuile.moitie { grid-column: span 1; padding: 28px 24px; }
-    .compteur { font-size: 84px; }
+    .tuile .compteur { font-size: 84px; }
     .etapes { grid-template-columns: 1fr; }
   }
 </style>
@@ -334,7 +335,7 @@
     </div>
     <div class="tuile apparait d2">
       <span class="retour" aria-hidden="true">↺</span>
-      <p class="t">Rien n'est définitif.</p>
+      <p class="t" style="padding-right:66px">Rien n'est définitif.</p>
       <p>Chaque fichier est sauvegardé avant d'être modifié. « Remettre comme avant » le rend exactement tel qu'il était.</p>
     </div>
     <div class="tuile moitie apparait">
