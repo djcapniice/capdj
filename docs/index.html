@@ -4,129 +4,225 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CapDJ — le copilote du DJ</title>
-<meta name="description" content="CapDJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau chargé sur la platine en un clic, et des points Cue calés selon la structure de vos morceaux. Gratuit.">
+<meta name="description" content="CapDJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau chargé sur la platine en un clic, et des points Cue calés à la mesure près. Gratuit.">
+<meta name="theme-color" content="#000000">
 <meta property="og:title" content="CapDJ — le copilote du DJ">
 <meta property="og:description" content="Le prochain morceau, chargé en un clic. Des points Cue calés à la mesure près. Gratuit, pour Mac.">
-<meta property="og:image" content="https://djcapniice.github.io/capdj/images/points-cue.png">
+<meta property="og:image" content="https://djcapniice.github.io/capdj/onde.png">
 <style>
   :root {
-    --texte: #1d1d1f; --doux: #6e6e73; --clair: #f5f5f7; --blanc: #fff;
-    --bleu: #0071e3; --bleu-survol: #0077ed; --lien: #0066cc;
-    --noir: #000; --texte-nuit: #f5f5f7; --doux-nuit: #86868b; --lien-nuit: #2997ff;
+    --noir: #000; --tuile: #111114; --tuile2: #18181c; --filet: rgba(255,255,255,.08);
+    --texte: #f5f5f7; --doux: #a1a1a6; --faible: #6e6e73;
+    --orange: #ff9f0a; --rose: #ff375f; --violet: #bf5af2; --bleu: #2997ff; --vert: #30d158;
     --police: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--blanc); color: var(--texte); font: 17px/1.47 var(--police); letter-spacing: -0.022em; -webkit-font-smoothing: antialiased; }
-  img { max-width: 100%; display: block; }
-  a { color: var(--lien); text-decoration: none; }
+  html { background: var(--noir); }
+  body { margin: 0; background: var(--noir); color: var(--texte); font: 17px/1.47 var(--police); letter-spacing: -0.022em;
+         -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: var(--bleu); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  /* Barre de navigation */
-  nav {
-    position: sticky; top: 0; z-index: 10; height: 48px;
-    background: rgba(251, 251, 253, 0.8); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  }
-  nav .dedans { max-width: 1024px; height: 100%; margin: 0 auto; padding: 0 22px; display: flex; align-items: center; gap: 28px; }
-  nav .marque { font-weight: 600; font-size: 21px; letter-spacing: -0.02em; color: var(--texte); margin-right: auto; }
-  nav .marque:hover { text-decoration: none; }
-  nav .liens a { color: var(--texte); font-size: 12px; opacity: 0.85; margin-left: 24px; }
-  nav .liens a:hover { opacity: 1; text-decoration: none; }
-  .pilule { display: inline-block; background: var(--bleu); color: #fff; border-radius: 980px; font-weight: 400; }
-  .pilule:hover { background: var(--bleu-survol); text-decoration: none; }
-  nav .pilule { font-size: 12px; padding: 4px 11px; }
+  /* ---------- Navigation ---------- */
+  nav { position: fixed; inset: 0 0 auto 0; z-index: 20; height: 48px; background: rgba(0,0,0,.6);
+        backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid var(--filet); }
+  nav .dedans { max-width: 1024px; height: 100%; margin: 0 auto; padding: 0 22px; display: flex; align-items: center; gap: 26px; }
+  nav .marque { font-weight: 600; font-size: 20px; color: var(--texte); margin-right: auto; letter-spacing: -0.02em; }
+  nav .marque b { background: linear-gradient(90deg, var(--orange), var(--rose)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  nav .marque:hover, nav .liens a:hover { text-decoration: none; }
+  nav .liens a { color: var(--texte); opacity: .8; font-size: 12px; margin-left: 22px; transition: opacity .2s; }
+  nav .liens a:hover { opacity: 1; }
+  .cta { display: inline-flex; align-items: center; gap: 9px; color: #fff; font-weight: 600; border-radius: 980px;
+         background: linear-gradient(135deg, var(--orange), var(--rose)); box-shadow: 0 8px 30px rgba(255, 70, 70, .35);
+         transition: transform .25s ease, box-shadow .25s ease; }
+  .cta:hover { text-decoration: none; transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 44px rgba(255, 70, 70, .5); }
+  nav .cta { font-size: 12px; padding: 5px 13px; box-shadow: none; }
 
-  /* Sections */
-  section { padding: 100px 22px; }
+  /* ---------- Ouverture ---------- */
+  .hero { position: relative; min-height: 100vh; padding: 120px 22px 60px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+  .aurore { position: absolute; inset: -20% -10% auto -10%; height: 900px; pointer-events: none; filter: blur(90px); opacity: .55; }
+  .aurore i { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+  .aurore i:nth-child(1) { width: 620px; height: 620px; left: 10%; top: 10%; background: #ff6a00; animation: flotte1 18s ease-in-out infinite alternate; }
+  .aurore i:nth-child(2) { width: 560px; height: 560px; right: 8%; top: 0; background: #ff2d75; animation: flotte2 22s ease-in-out infinite alternate; }
+  .aurore i:nth-child(3) { width: 520px; height: 520px; left: 38%; top: 30%; background: #7a3cff; animation: flotte3 26s ease-in-out infinite alternate; }
+  @keyframes flotte1 { to { transform: translate(140px, 80px) scale(1.15); } }
+  @keyframes flotte2 { to { transform: translate(-160px, 120px) scale(.9); } }
+  @keyframes flotte3 { to { transform: translate(60px, -100px) scale(1.2); } }
+  .hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 260px; background: linear-gradient(transparent, #000); pointer-events: none; }
+  .hero-texte { position: relative; z-index: 2; text-align: center; max-width: 900px; }
+  .surtitre { display: inline-block; font-size: 14px; font-weight: 600; letter-spacing: .02em; color: #fff; padding: 6px 14px; border-radius: 980px;
+              background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(10px); margin: 0 0 22px; }
+  h1 { font-size: 136px; line-height: .95; font-weight: 700; letter-spacing: -0.045em; margin: 0;
+       background: linear-gradient(180deg, #fff 30%, #9a9aa0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .slogan { font-size: 48px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; margin: 14px 0 20px;
+            background: linear-gradient(90deg, #ff9f0a, #ff375f, #bf5af2, #2997ff, #ff9f0a); background-size: 300% 100%;
+            -webkit-background-clip: text; background-clip: text; color: transparent; animation: chatoie 8s linear infinite; }
+  @keyframes chatoie { to { background-position: 300% 0; } }
+  .chapo { font-size: 22px; line-height: 1.38; color: var(--doux); font-weight: 500; letter-spacing: .004em; max-width: 680px; margin: 0 auto; }
+  .chapo strong { color: var(--texte); font-weight: 600; }
+  .actions { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 34px; flex-wrap: wrap; }
+  .actions .cta { font-size: 18px; padding: 15px 30px; }
+  .actions .lien { font-size: 18px; }
+  .petit { font-size: 13px; color: var(--faible); margin-top: 20px; letter-spacing: 0; }
+
+  .platine { position: relative; z-index: 2; width: min(1100px, 100%); margin-top: 64px; }
+  .ecran { position: relative; border-radius: 22px; padding: 18px 0 14px; background: linear-gradient(180deg, rgba(28,28,32,.85), rgba(10,10,12,.9));
+           border: 1px solid rgba(255,255,255,.1); box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 80px rgba(255,90,60,.12) inset; overflow: hidden; }
+  .ecran canvas { display: block; width: 100%; height: 230px;
+                  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .hud { display: flex; justify-content: space-between; gap: 12px; padding: 14px 22px 0; flex-wrap: wrap; }
+  .puce { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--doux); padding: 8px 14px; border-radius: 14px;
+          background: rgba(255,255,255,.05); border: 1px solid var(--filet); transition: opacity .5s, transform .5s; }
+  .puce b { color: var(--texte); font-weight: 600; }
+  .puce .cle { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #111; }
+  .puce.change { opacity: 0; transform: translateY(6px); }
+  .point-vivant { width: 8px; height: 8px; border-radius: 50%; background: var(--vert); box-shadow: 0 0 10px var(--vert); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; padding: 130px 22px; }
   .centre { max-width: 980px; margin: 0 auto; text-align: center; }
-  .large { max-width: 1120px; margin: 0 auto; }
-  .surtitre { font-size: 21px; font-weight: 600; color: #bf4800; margin: 0 0 6px; letter-spacing: 0.011em; }
-  h1 { font-size: 96px; line-height: 1.04; font-weight: 600; letter-spacing: -0.03em; margin: 0; }
-  .sous-titre { font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; margin: 8px 0 18px;
-    background: linear-gradient(90deg, #ff6b00, #ff2d55 45%, #af52de 80%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  h2 { font-size: 64px; line-height: 1.06; font-weight: 600; letter-spacing: -0.028em; margin: 0 0 20px; }
-  .chapo { font-size: 24px; line-height: 1.34; font-weight: 500; color: var(--doux); max-width: 760px; margin: 0 auto; letter-spacing: 0.005em; }
-  .actions { display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
-  .actions .pilule { font-size: 17px; padding: 12px 24px; }
-  .actions .lien { font-size: 17px; }
-  .petit { font-size: 14px; color: var(--doux); margin-top: 18px; letter-spacing: -0.01em; }
+  .etiquette { font-size: 17px; font-weight: 600; margin: 0 0 12px; }
+  h2 { font-size: 72px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; margin: 0 0 22px; }
+  .degrade-1 { background: linear-gradient(90deg, #ff9f0a, #ff375f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .degrade-2 { background: linear-gradient(90deg, #30d158, #2997ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .degrade-3 { background: linear-gradient(90deg, #bf5af2, #ff375f, #ff9f0a); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-  /* Fenêtre Mac autour des captures */
-  .fenetre { border-radius: 12px; overflow: hidden; background: #1e1e22; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.18); }
-  .fenetre .barre { height: 28px; background: #2a2a2f; display: flex; align-items: center; gap: 8px; padding: 0 12px; }
-  .fenetre .barre i { width: 12px; height: 12px; border-radius: 50%; display: block; }
-  .fenetre .barre i:nth-child(1) { background: #ff5f57; } .fenetre .barre i:nth-child(2) { background: #febc2e; } .fenetre .barre i:nth-child(3) { background: #28c840; }
-  .hero-image { margin: 70px auto 0; max-width: 1000px; }
+  /* Copilote */
+  .copilote { display: grid; grid-template-columns: 1fr 420px; gap: 80px; align-items: center; max-width: 1060px; margin: 0 auto; }
+  .copilote .texte h2, .copilote .texte .chapo { text-align: left; margin-left: 0; }
+  .avantages { list-style: none; padding: 0; margin: 34px 0 0; display: grid; gap: 18px; }
+  .avantages li { display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: start; color: var(--doux); font-size: 16px; }
+  .avantages li b { display: block; color: var(--texte); font-size: 17px; }
+  .avantages .ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--tuile2); border: 1px solid var(--filet); font-size: 16px; }
+  .scene { perspective: 1400px; }
+  .panneau { position: relative; border-radius: 26px; padding: 16px; background: rgba(30,30,34,.75); border: 1px solid rgba(255,255,255,.12);
+             backdrop-filter: blur(30px); box-shadow: 0 50px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(0,0,0,.4);
+             transform-origin: 50% 100%; will-change: transform; }
+  .panneau::before { content: ""; position: absolute; inset: -40px; z-index: -1; border-radius: 60px; filter: blur(60px); opacity: .45;
+                     background: radial-gradient(circle at 30% 30%, #ff6a00, transparent 60%), radial-gradient(circle at 70% 70%, #7a3cff, transparent 60%); }
+  .onglets { display: flex; gap: 4px; padding: 3px; border-radius: 980px; background: rgba(255,255,255,.06); margin-bottom: 12px; font-size: 13px; }
+  .onglets span { flex: 1; text-align: center; padding: 6px; border-radius: 980px; color: var(--doux); }
+  .onglets .actif { background: rgba(255,255,255,.14); color: var(--texte); font-weight: 600; }
+  .en-cours { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,.07); border: 1px solid var(--filet); margin-bottom: 10px; }
+  .en-cours .infos { flex: 1; min-width: 0; transition: opacity .35s, transform .35s; }
+  .en-cours .infos.change { opacity: 0; transform: translateX(-10px); }
+  .titre-m { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .artiste-m { color: var(--doux); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cle-m { flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 14px; color: #111;
+           transition: background .5s; box-shadow: inset 0 1px 0 rgba(255,255,255,.5); }
+  .bpm-m { text-align: right; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bpm-m small { display: block; font-size: 10px; font-weight: 600; color: var(--doux); }
+  .liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; min-height: 248px; }
+  .ligne { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 14px; background: rgba(255,255,255,.045);
+           animation: entre .55s cubic-bezier(.2,.8,.2,1) both; transition: background .3s, transform .3s; }
+  .ligne .cle-m { width: 34px; height: 34px; font-size: 11px; border-radius: 9px; }
+  .ligne .infos { flex: 1; min-width: 0; }
+  .ligne .titre-m { font-size: 14px; }
+  .ligne .artiste-m { font-size: 12px; }
+  .ligne .bpm { color: var(--doux); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 14px; }
+  .deck { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #111; background: #d9883a; transition: transform .2s, box-shadow .2s, background .2s; }
+  .ligne.choisie { background: rgba(255,159,10,.16); transform: scale(1.02); }
+  .deck.presse { transform: scale(.85); background: #fff; box-shadow: 0 0 0 6px rgba(255,159,10,.35), 0 0 24px rgba(255,159,10,.8); }
+  @keyframes entre { from { opacity: 0; transform: translateY(14px); } }
+  .toast { position: absolute; left: 50%; bottom: -18px; transform: translate(-50%, 10px); opacity: 0; white-space: nowrap; font-size: 13px; font-weight: 600;
+           padding: 8px 14px; border-radius: 980px; background: rgba(48,209,88,.16); color: #5ee08a; border: 1px solid rgba(48,209,88,.35); backdrop-filter: blur(10px);
+           transition: opacity .35s, transform .35s; }
+  .toast.vu { opacity: 1; transform: translate(-50%, 0); }
 
-  /* Section noire : le copilote */
-  .nuit { background: var(--noir); color: var(--texte-nuit); }
-  .nuit .chapo { color: var(--doux-nuit); }
-  .nuit a { color: var(--lien-nuit); }
-  .copilote { display: grid; grid-template-columns: 1fr 360px; gap: 70px; align-items: center; max-width: 1000px; margin: 0 auto; }
-  .copilote h2 { text-align: left; }
-  .copilote .chapo { margin: 0; text-align: left; }
-  .points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 44px; }
-  .points h3 { font-size: 17px; margin: 0 0 4px; color: var(--texte-nuit); }
-  .points p { margin: 0; font-size: 15px; color: var(--doux-nuit); line-height: 1.45; }
-  .panneau { max-width: 360px; justify-self: center; }
+  /* Points Cue */
+  .demo { max-width: 1060px; margin: 64px auto 0; border-radius: 28px; padding: 26px 26px 22px; background: var(--tuile); border: 1px solid var(--filet); }
+  .demo canvas { display: block; width: 100%; height: 210px; border-radius: 14px; background: #000; }
+  .clavier { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; color: var(--doux); font-size: 14px; }
+  .touche { min-width: 46px; height: 46px; padding: 0 12px; display: inline-grid; place-items: center; border-radius: 11px; font-size: 18px; font-weight: 600; color: var(--texte);
+            background: linear-gradient(180deg, #2a2a2f, #1c1c20); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 3px 0 #0a0a0c, inset 0 1px 0 rgba(255,255,255,.08);
+            transition: transform .12s, box-shadow .12s, background .12s, color .12s; }
+  .touche.appuyee { transform: translateY(3px); box-shadow: 0 0 0 #0a0a0c, 0 0 24px rgba(255,159,10,.55); background: linear-gradient(180deg, #ffb340, #ff8a00); color: #111; }
+  .clavier .sep { width: 1px; height: 26px; background: var(--filet); margin: 0 6px; }
+  .legende { text-align: center; color: var(--doux); font-size: 15px; margin: 14px 0 0; min-height: 22px; }
 
-  /* Tuiles */
-  .gris { background: var(--clair); }
-  .tuiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 1024px; margin: 60px auto 0; }
-  .tuile { background: var(--blanc); border-radius: 28px; padding: 40px 36px; text-align: left; grid-column: span 2; display: flex; flex-direction: column; }
+  .tuiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 1060px; margin: 20px auto 0; }
+  .tuile { grid-column: span 2; border-radius: 28px; padding: 34px 32px; background: var(--tuile); border: 1px solid var(--filet); overflow: hidden; position: relative; }
   .tuile.moitie { grid-column: span 3; }
-  .tuile.entiere { grid-column: span 6; padding: 44px 44px 0; }
-  .tuile .titre { font-size: 28px; line-height: 1.14; font-weight: 600; letter-spacing: -0.016em; margin: 0 0 10px; }
-  .tuile p { margin: 0; color: var(--doux); font-size: 17px; }
-  .tuile .grand { font-size: 80px; line-height: 1; font-weight: 700; letter-spacing: -0.04em; margin: 4px 0 12px;
-    background: linear-gradient(135deg, #cc0000, #cccc00 30%, #00cc00 50%, #00cccc 65%, #0000cc 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .touches { margin-top: auto; padding-top: 22px; display: flex; gap: 8px; flex-wrap: wrap; }
-  .touche { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 10px; border-radius: 9px;
-    background: var(--clair); border: 1px solid #d2d2d7; font-size: 15px; font-weight: 500; color: var(--texte); box-shadow: 0 1px 0 #d2d2d7; }
-  .onde { margin-top: 30px; border-radius: 14px 14px 0 0; overflow: hidden; background: #000; }
+  .tuile .t { font-size: 24px; line-height: 1.17; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .tuile p { margin: 0; color: var(--doux); font-size: 16px; }
+  .compteur { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -0.05em; margin: 0 0 10px; font-variant-numeric: tabular-nums;
+              background: linear-gradient(135deg, #ff3b30, #ffd60a 35%, #30d158 55%, #64d2ff 75%, #5e5ce6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .pastilles { display: flex; gap: 7px; margin-top: 18px; }
+  .pastilles i { width: 16px; height: 16px; border-radius: 5px; opacity: 0; transform: scale(.4); transition: opacity .4s, transform .4s cubic-bezier(.3,1.6,.5,1); }
+  .visible .pastilles i { opacity: 1; transform: none; }
+  .parties { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .parties span { font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 980px; color: #111; opacity: 0; transform: translateY(10px);
+                  transition: opacity .45s, transform .45s; }
+  .visible .parties span { opacity: 1; transform: none; }
+  .barre-lot { height: 10px; border-radius: 980px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 22px; }
+  .barre-lot i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #30d158, #64d2ff); }
+  .etat-lot { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; color: var(--doux); font-variant-numeric: tabular-nums; }
+  .etat-lot b { color: var(--texte); }
+  .retour { position: absolute; right: 26px; top: 26px; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
+            background: rgba(191,90,242,.15); border: 1px solid rgba(191,90,242,.35); font-size: 24px; color: #d9a3ff; }
+  .visible .retour { animation: tourne 2.4s cubic-bezier(.6,0,.2,1) infinite; }
+  @keyframes tourne { 0%, 55% { transform: rotate(0); } 85%, 100% { transform: rotate(-360deg); } }
 
   /* Installation */
-  .etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1024px; margin: 60px auto 0; text-align: left; }
-  .etape { background: var(--clair); border-radius: 22px; padding: 30px 26px; }
-  .etape .num { font-size: 40px; font-weight: 700; color: #bf4800; line-height: 1; margin-bottom: 14px; }
-  .etape h3 { font-size: 19px; margin: 0 0 6px; letter-spacing: -0.01em; }
-  .etape p { margin: 0; font-size: 15px; color: var(--doux); line-height: 1.45; }
-  .remarque { max-width: 760px; margin: 40px auto 0; font-size: 14px; color: var(--doux); }
+  .etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1060px; margin: 64px auto 0; }
+  .etape { border-radius: 24px; padding: 30px 26px; background: var(--tuile); border: 1px solid var(--filet); transition: transform .3s, border-color .3s; }
+  .etape:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.18); }
+  .etape .n { font-size: 48px; font-weight: 800; line-height: 1; margin-bottom: 16px; }
+  .etape h3 { font-size: 20px; margin: 0 0 6px; letter-spacing: -0.015em; }
+  .etape p { margin: 0; color: var(--doux); font-size: 15px; line-height: 1.45; }
+  .remarque { max-width: 720px; margin: 34px auto 0; text-align: center; color: var(--faible); font-size: 14px; }
 
   /* Fin */
-  .fin h2 { font-size: 56px; }
-  footer { background: var(--clair); color: var(--doux); font-size: 12px; line-height: 1.5; padding: 22px; }
-  footer .dedans { max-width: 980px; margin: 0 auto; border-top: 1px solid #d2d2d7; padding-top: 16px; }
+  .fin { text-align: center; overflow: hidden; }
+  .fin .halo { position: absolute; left: 50%; top: 50%; width: 900px; height: 500px; transform: translate(-50%, -50%); filter: blur(100px); opacity: .35; pointer-events: none;
+               background: radial-gradient(closest-side, #ff375f, transparent), radial-gradient(closest-side at 70% 60%, #ff9f0a, transparent); animation: respire 7s ease-in-out infinite alternate; }
+  @keyframes respire { to { transform: translate(-50%, -50%) scale(1.15); opacity: .5; } }
+  .fin h2 { font-size: 88px; position: relative; }
+  .fin .chapo, .fin .actions { position: relative; }
+  footer { border-top: 1px solid var(--filet); color: var(--faible); font-size: 12px; line-height: 1.5; padding: 24px 22px 40px; }
+  footer .dedans { max-width: 980px; margin: 0 auto; }
   footer p { margin: 0 0 8px; }
 
-  /* Apparition au défilement (seulement si le JavaScript tourne) */
-  .js .apparait { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s cubic-bezier(.2, .7, .2, 1); }
+  /* Apparition au défilement */
+  .js .apparait { opacity: 0; transform: translateY(46px); transition: opacity 1.1s ease, transform 1.1s cubic-bezier(.2,.7,.2,1); }
   .js .apparait.visible { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .js .apparait { opacity: 1; transform: none; transition: none; } }
+  .js .apparait.d1 { transition-delay: .12s; } .js .apparait.d2 { transition-delay: .24s; } .js .apparait.d3 { transition-delay: .36s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .js .apparait { opacity: 1; transform: none; }
+  }
 
   /* Tablette */
   @media (max-width: 1068px) {
-    h1 { font-size: 80px; } h2 { font-size: 48px; } .sous-titre { font-size: 32px; } .chapo { font-size: 21px; }
-    .copilote { grid-template-columns: 1fr 300px; gap: 40px; }
-    .tuile .titre { font-size: 24px; }
+    h1 { font-size: 110px; } .slogan { font-size: 40px; } h2 { font-size: 56px; } .fin h2 { font-size: 64px; }
+    .copilote { grid-template-columns: 1fr 380px; gap: 50px; }
     .etapes { grid-template-columns: repeat(2, 1fr); }
+    .tuile .t { font-size: 22px; }
   }
   /* Téléphone */
   @media (max-width: 734px) {
     nav .liens { display: none; }
-    section { padding: 70px 16px; }
-    h1 { font-size: 56px; } h2 { font-size: 36px; } .sous-titre { font-size: 26px; } .chapo { font-size: 19px; }
-    .hero-image { margin-top: 44px; }
-    .copilote { grid-template-columns: 1fr; gap: 40px; }
-    .copilote h2, .copilote .chapo { text-align: center; }
-    .points { grid-template-columns: 1fr; text-align: center; }
+    .hero { padding: 100px 16px 40px; min-height: auto; }
+    h1 { font-size: 76px; } .slogan { font-size: 30px; } .chapo { font-size: 18px; }
+    .actions .cta, .actions .lien { font-size: 17px; }
+    .platine { margin-top: 44px; }
+    .ecran canvas { height: 150px; }
+    .hud { padding: 12px 14px 0; }
+    .puce { font-size: 12px; }
+    section { padding: 90px 16px; }
+    h2 { font-size: 40px; } .fin h2 { font-size: 44px; }
+    .copilote { grid-template-columns: 1fr; gap: 50px; }
+    .copilote .texte h2, .copilote .texte .chapo { text-align: center; }
+    .demo { padding: 14px; border-radius: 22px; }
+    .demo canvas { height: 150px; }
+    .touche { min-width: 40px; height: 40px; font-size: 16px; }
     .tuiles { grid-template-columns: 1fr; }
-    .tuile, .tuile.moitie, .tuile.entiere { grid-column: span 1; padding: 32px 26px; }
-    .tuile.entiere { padding-bottom: 0; }
-    .tuile .grand { font-size: 64px; }
+    .tuile, .tuile.moitie { grid-column: span 1; padding: 28px 24px; }
+    .compteur { font-size: 84px; }
     .etapes { grid-template-columns: 1fr; }
-    .fin h2 { font-size: 36px; }
   }
 </style>
 <script>document.documentElement.classList.add('js');</script>
@@ -135,128 +231,421 @@
 
 <nav>
   <div class="dedans">
-    <a class="marque" href="#">CapDJ</a>
+    <a class="marque" href="#">Cap<b>DJ</b></a>
     <div class="liens">
       <a href="#copilote">Copilote</a>
       <a href="#points-cue">Points Cue</a>
       <a href="#installation">Installation</a>
     </div>
-    <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger</a>
+    <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger</a>
   </div>
 </nav>
 
-<section>
-  <div class="centre">
-    <p class="surtitre">Nouveau · gratuit</p>
-    <h1>CapDJ</h1>
-    <p class="sous-titre">Le copilote du DJ.</p>
-    <p class="chapo">Le prochain morceau, chargé sur la platine en un clic. Des points Cue calés à la mesure près. Juste à côté de Serato DJ Pro.</p>
-    <div class="actions">
-      <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
-      <a class="lien" href="#installation">Comment l'installer ›</a>
+<header class="hero">
+  <div class="aurore" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="hero-texte">
+    <p class="surtitre apparait">Gratuit · pour Mac · version bêta</p>
+    <h1 class="apparait d1">CapDJ</h1>
+    <p class="slogan apparait d1">Le copilote du DJ.</p>
+    <p class="chapo apparait d2">Le <strong>prochain morceau</strong>, chargé sur la platine en un clic. Des <strong>points Cue</strong> calés à la mesure près. Juste à côté de Serato DJ Pro.</p>
+    <div class="actions apparait d3">
+      <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Télécharger pour Mac
+      </a>
+      <a class="lien" href="#copilote">Voir comment ça marche ›</a>
     </div>
-    <p class="petit">par DJ Cap Niice · macOS 14 ou plus récent · Apple Silicon et Intel</p>
+    <p class="petit apparait d3">par DJ Cap Niice · macOS 14 ou plus récent · Apple Silicon et Intel · Serato DJ Pro 4</p>
   </div>
-  <div class="hero-image apparait">
-    <div class="fenetre"><div class="barre"><i></i><i></i><i></i></div><img src="images/points-cue.png" alt="La fenêtre Points Cue de CapDJ : forme d'onde en couleurs, grille des temps et Cue numérotés" width="2000" height="1280"></div>
-  </div>
-</section>
 
-<section class="nuit" id="copilote">
+  <div class="platine apparait d3">
+    <div class="ecran">
+      <canvas id="onde-hero" aria-label="Forme d'onde en couleurs qui défile, avec la tête de lecture, la grille des temps et des points Cue numérotés"></canvas>
+      <div class="hud">
+        <div class="puce" id="hud-en-cours"><span class="point-vivant"></span><span>En cours</span><b>Noite de Luanda</b><span>124 BPM</span></div>
+        <div class="puce" id="hud-suivant"><span class="cle" style="background:hsl(345,100%,70%)">11A</span><span>Suivant proposé</span><b>Areia Branca</b></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="copilote">
   <div class="copilote">
-    <div class="apparait">
-      <h2>Le prochain morceau.<br>Toujours prêt.</h2>
-      <p class="chapo">CapDJ suit ce que vous jouez et propose la suite, en accord avec la tonalité et le tempo. Il apprend de vos soirées : les enchaînements que vous aimez remontent en premier.</p>
+    <div class="texte">
+      <p class="etiquette degrade-1 apparait">Copilote</p>
+      <h2 class="apparait">Le prochain morceau.<br><span class="degrade-1">Toujours prêt.</span></h2>
+      <p class="chapo apparait d1">CapDJ suit ce que vous jouez et propose la suite, en accord avec la tonalité et le tempo. Il apprend de vos soirées : les enchaînements que vous aimez remontent en premier.</p>
+      <ul class="avantages">
+        <li class="apparait d1"><span class="ico">🎚️</span><span><b>Platines 1 et 2</b>Un clic, et le morceau se charge dans Serato.</span></li>
+        <li class="apparait d2"><span class="ico">📚</span><span><b>Votre bibliothèque, telle quelle</b>Vos morceaux, vos bacs et votre historique. Rien à importer.</span></li>
+        <li class="apparait d3"><span class="ico">✨</span><span><b>À découvrir</b>Des titres Apple Music jamais joués, proposés à part.</span></li>
+      </ul>
     </div>
-    <div class="panneau apparait">
-      <div class="fenetre"><div class="barre"><i></i><i></i><i></i></div><img src="images/copilote.png" alt="Le copilote CapDJ : le morceau en cours et les suggestions, avec les boutons 1 et 2" width="640" height="800"></div>
+    <div class="scene apparait d1">
+      <div class="panneau" id="panneau">
+        <div class="onglets"><span class="actif">Mes sons</span><span>À découvrir</span></div>
+        <div class="en-cours">
+          <div class="cle-m" id="pc-cle">11A</div>
+          <div class="infos" id="pc-infos"><div class="titre-m" id="pc-titre">Noite de Luanda</div><div class="artiste-m" id="pc-artiste">Kiala &amp; Mano Zé</div></div>
+          <div class="bpm-m"><span id="pc-bpm">124</span><small>BPM</small></div>
+        </div>
+        <ul class="liste" id="pc-liste"></ul>
+        <div class="toast" id="pc-toast">✓ Chargé sur la platine 1</div>
+      </div>
     </div>
-  </div>
-  <div class="points large" style="max-width:1000px">
-    <div class="apparait"><h3>Votre bibliothèque</h3><p>Vos morceaux, vos bacs et votre historique Serato, lus tels quels. Rien à importer.</p></div>
-    <div class="apparait"><h3>Platines 1 et 2</h3><p>Un clic, et le morceau se charge sur la platine choisie dans Serato.</p></div>
-    <div class="apparait"><h3>À découvrir</h3><p>Des titres Apple Music que vous n'avez encore jamais joués, proposés à part.</p></div>
   </div>
 </section>
 
-<section class="gris" id="points-cue">
-  <div class="centre apparait">
-    <h2>Vos Cue,<br>à la mesure près.</h2>
-    <p class="chapo">CapDJ repère la structure de chaque morceau et place les Cue là où ça compte. Vous écoutez, vous ajustez au clavier, vous validez.</p>
+<section id="points-cue" style="background: linear-gradient(180deg, #000, #07070a 30%, #000);">
+  <div class="centre">
+    <p class="etiquette degrade-2 apparait">Points Cue</p>
+    <h2 class="apparait">Vos Cue,<br><span class="degrade-2">à la mesure près.</span></h2>
+    <p class="chapo apparait d1">CapDJ repère la structure de chaque morceau et place les Cue là où ça compte. Vous écoutez, vous ajustez au clavier, vous validez.</p>
   </div>
+
+  <div class="demo apparait d1">
+    <canvas id="onde-cue" aria-label="Démonstration : des points Cue avancent mesure par mesure jusqu'au bon endroit, puis sont validés"></canvas>
+    <div class="clavier" aria-hidden="true">
+      <span class="touche" id="t-gauche">←</span><span class="touche" id="t-droite">→</span>
+      <span class="sep"></span><span class="touche" id="t-option">⌥</span><span class="touche" id="t-espace" style="min-width:120px">espace</span>
+      <span class="sep"></span><span class="touche" id="t-entree">↩︎</span>
+    </div>
+    <p class="legende" id="legende">→ une mesure plus tard · espace pour écouter · ↩︎ pour valider</p>
+  </div>
+
   <div class="tuiles">
     <div class="tuile apparait">
-      <p class="titre">La structure, repérée pour vous.</p>
-      <p>Intro, couplet, montée, refrain, break, outro : chaque partie a sa couleur, comme dans Serato.</p>
+      <p class="compteur" data-jusqua="8">0</p>
+      <p class="t">Cue par morceau.</p>
+      <p>Vos propres Cue restent à leur place. CapDJ remplit les emplacements libres.</p>
+      <div class="pastilles">
+        <i style="background:#cc0000;transition-delay:.1s"></i><i style="background:#cccc00;transition-delay:.18s"></i><i style="background:#00cc00;transition-delay:.26s"></i><i style="background:#00cccc;transition-delay:.34s"></i>
+        <i style="background:#0000cc;transition-delay:.42s"></i><i style="background:#cc00cc;transition-delay:.5s"></i><i style="background:#cc8800;transition-delay:.58s"></i><i style="background:#88cc00;transition-delay:.66s"></i>
+      </div>
     </div>
-    <div class="tuile apparait">
-      <p class="grand">8</p>
-      <p class="titre">Cue par morceau.</p>
-      <p>Vos propres Cue restent à leur place. CapDJ ne remplit que les emplacements libres.</p>
+    <div class="tuile apparait d1">
+      <p class="t">La structure, repérée pour vous.</p>
+      <p>Chaque partie a sa couleur, comme dans Serato.</p>
+      <div class="parties">
+        <span style="background:#ff4d4d;transition-delay:.1s">Intro</span><span style="background:#e6e64d;transition-delay:.2s">Couplet</span>
+        <span style="background:#e64de6;transition-delay:.3s">Montée</span><span style="background:#4de64d;transition-delay:.4s">Refrain</span>
+        <span style="background:#4de6e6;transition-delay:.5s">Break</span><span style="background:#ffaa33;transition-delay:.6s">Pont</span><span style="background:#6b6bff;transition-delay:.7s;color:#fff">Outro</span>
+      </div>
     </div>
-    <div class="tuile apparait">
-      <p class="titre">Calés à l'oreille.</p>
-      <p>Une mesure plus tôt, un temps plus tard : vous entendez le résultat aussitôt.</p>
-      <div class="touches"><span class="touche">←</span><span class="touche">→</span><span class="touche">⌥</span><span class="touche">↩︎</span></div>
-    </div>
-    <div class="tuile moitie apparait">
-      <p class="titre">Un dossier entier, en une fois.</p>
-      <p>Validez une sélection, un bac ou toute une bibliothèque. Les morceaux déjà calés ne sont jamais retouchés.</p>
-    </div>
-    <div class="tuile moitie apparait">
-      <p class="titre">Rien n'est définitif.</p>
+    <div class="tuile apparait d2">
+      <span class="retour" aria-hidden="true">↺</span>
+      <p class="t">Rien n'est définitif.</p>
       <p>Chaque fichier est sauvegardé avant d'être modifié. « Remettre comme avant » le rend exactement tel qu'il était.</p>
     </div>
-    <div class="tuile entiere apparait">
-      <p class="titre">Une forme d'onde qui se lit d'un coup d'œil.</p>
-      <p>Basses en rouge, médiums en vert, aigus en bleu. La grille des temps et les Cue numérotés tombent pile sur la musique.</p>
-      <div class="onde"><img src="onde.png" alt="Forme d'onde en couleurs avec la grille des temps et un Cue numéroté" width="1250" height="370"></div>
+    <div class="tuile moitie apparait">
+      <p class="t">Un dossier entier, en une fois.</p>
+      <p>Validez une sélection, un bac ou toute votre bibliothèque. Les morceaux déjà calés ne sont jamais retouchés.</p>
+      <div class="barre-lot"><i id="lot-barre"></i></div>
+      <div class="etat-lot"><span id="lot-texte">Validation…</span><b id="lot-compte">0 / 640</b></div>
+    </div>
+    <div class="tuile moitie apparait d1">
+      <p class="t">Même sans grille Serato.</p>
+      <p>Un morceau jamais analysé ? CapDJ trouve lui-même le tempo et les temps à partir du son, et vous laisse corriger d'un clic.</p>
+      <div class="parties" style="margin-top:22px">
+        <span style="background:rgba(255,255,255,.1);color:#f5f5f7;transition-delay:.1s">÷ 2</span><span style="background:rgba(255,255,255,.1);color:#f5f5f7;transition-delay:.2s">× 2</span>
+        <span style="background:rgba(255,255,255,.1);color:#f5f5f7;transition-delay:.3s">‹ ›</span><span style="background:rgba(255,255,255,.1);color:#f5f5f7;transition-delay:.4s">+1 temps</span>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="installation">
-  <div class="centre apparait">
-    <h2>Installé en deux minutes.</h2>
-    <p class="chapo">Gratuit, sans compte et sans abonnement. CapDJ ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
+  <div class="centre">
+    <p class="etiquette degrade-3 apparait">Installation</p>
+    <h2 class="apparait">Prêt en <span class="degrade-3">deux minutes.</span></h2>
+    <p class="chapo apparait d1">Gratuit, sans compte et sans abonnement. CapDJ ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
   </div>
   <div class="etapes">
-    <div class="etape apparait"><div class="num">1</div><h3>Téléchargez</h3><p>Ouvrez <strong>CapDJ.dmg</strong> et glissez CapDJ dans le dossier Applications.</p></div>
-    <div class="etape apparait"><div class="num">2</div><h3>Ouvrez</h3><p>Lancez CapDJ. Si macOS affiche qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
-    <div class="etape apparait"><div class="num">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : cliquez sur « Ouvrir quand même ». Une seule fois.</p></div>
-    <div class="etape apparait"><div class="num">4</div><h3>Jouez</h3><p>Dans CapDJ, cliquez sur « Autoriser » puis activez CapDJ dans Accessibilité pour charger sur les platines.</p></div>
+    <div class="etape apparait"><div class="n degrade-1">1</div><h3>Téléchargez</h3><p>Ouvrez <b>CapDJ.dmg</b> et glissez CapDJ dans le dossier Applications.</p></div>
+    <div class="etape apparait d1"><div class="n degrade-1">2</div><h3>Ouvrez</h3><p>Lancez CapDJ. Si macOS dit qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
+    <div class="etape apparait d2"><div class="n degrade-3">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : « Ouvrir quand même ». Une seule fois.</p></div>
+    <div class="etape apparait d3"><div class="n degrade-2">4</div><h3>Jouez</h3><p>Dans CapDJ, « Autoriser », puis activez CapDJ dans Accessibilité pour charger sur les platines.</p></div>
   </div>
-  <p class="remarque centre">CapDJ n'est pas encore signé par Apple, d'où l'étape 3. Il faut macOS 14 ou plus récent et Serato DJ Pro 4.</p>
+  <p class="remarque apparait">CapDJ n'est pas encore signé par Apple, d'où l'étape 3. Il faut macOS 14 ou plus récent et Serato DJ Pro 4.</p>
 </section>
 
-<section class="gris fin">
-  <div class="centre apparait">
-    <h2>Gratuit. Pour tous les DJ.</h2>
-    <p class="chapo">Fait par un DJ, pour les DJ.</p>
-    <div class="actions">
-      <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
-      <a class="lien" href="https://github.com/djcapniice/capdj/releases">Toutes les versions ›</a>
-    </div>
+<section class="fin">
+  <div class="halo" aria-hidden="true"></div>
+  <h2 class="apparait">Gratuit.<br><span class="degrade-1">Pour tous les DJ.</span></h2>
+  <p class="chapo apparait d1">Fait par un DJ, pour les DJ.</p>
+  <div class="actions apparait d2">
+    <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
+    <a class="lien" href="https://github.com/djcapniice/capdj/releases">Toutes les versions ›</a>
   </div>
 </section>
 
 <footer>
   <div class="dedans">
-    <p>CapDJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited. Apple Music, Mac et macOS sont des marques d'Apple Inc.</p>
+    <p>CapDJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited. Apple Music, Mac et macOS sont des marques d'Apple Inc. Les morceaux montrés sur cette page sont fictifs.</p>
     <p>CapDJ © 2026 DJ Cap Niice. Gratuit pour un usage personnel.</p>
   </div>
 </footer>
 
 <script>
-  // Les blocs apparaissent en douceur quand on les fait défiler.
-  (function () {
-    var blocs = document.querySelectorAll('.apparait');
-    if (!('IntersectionObserver' in window)) { blocs.forEach(function (b) { b.classList.add('visible'); }); return; }
-    var obs = new IntersectionObserver(function (entrees) {
-      entrees.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-    }, { threshold: 0.15 });
+(function () {
+  var calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Apparitions au défilement ----------
+  var blocs = document.querySelectorAll('.apparait, .tuile');
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
     blocs.forEach(function (b) { obs.observe(b); });
+  } else { blocs.forEach(function (b) { b.classList.add('visible'); }); }
+
+  // ---------- Outils ----------
+  function preparer(c) {
+    var r = c.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.max(1, Math.round(r.width * d)); c.height = Math.max(1, Math.round(r.height * d));
+    var x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0);
+    return { x: x, w: r.width, h: r.height };
+  }
+  function bruit(n) { var s = Math.sin(n * 127.1 + 11.7) * 43758.5453; return s - Math.floor(s); }
+  function visibleALEcran(el, rappel) {
+    if (!('IntersectionObserver' in window)) { rappel(true); return; }
+    new IntersectionObserver(function (es) { rappel(es[0].isIntersecting); }, { threshold: 0 }).observe(el);
+  }
+  // Un morceau imaginaire, temps par temps : grosse caisse (basses), caisse claire et voix (médiums), charleston (aigus).
+  function section(mesure) {
+    var s = ((mesure % 64) + 64) % 64;
+    if (s < 8) return { e: .62, kick: 1 };
+    if (s < 24) return { e: .82, kick: 1 };
+    if (s < 28) return { e: .55, kick: 0 };
+    if (s < 32) return { e: .78, kick: 1 };
+    if (s < 56) return { e: 1, kick: 1 };
+    return { e: .68, kick: 1 };
+  }
+  function son(b) {
+    var t = Math.floor(b), ph = b - t, S = section(Math.floor(t / 4));
+    var kick = S.kick ? Math.exp(-ph * 6.2) : 0;
+    var claire = (t % 2 === 1) ? Math.exp(-ph * 8) : 0;
+    var charley = Math.exp(-Math.abs(ph - .5) * 24) + .35 * Math.exp(-Math.abs(ph - .25) * 36) + .35 * Math.exp(-Math.abs(ph - .75) * 36);
+    var grain = bruit(Math.floor(b * 64)) * .14;
+    var corps = .30 + .10 * Math.sin(b * .8) + grain;
+    return { l: (kick * .95 + .05) * S.e, m: (corps + claire * .45) * S.e, h: (charley * .5 + grain) * S.e };
+  }
+  // Couleur et hauteur d'une colonne : rouge = basses, vert = médiums, bleu = aigus.
+  function colonne(v) {
+    var r = v.l, g = v.m * .92, bl = v.h, m = Math.max(r, g, bl) || 1;
+    var amp = Math.min(1, Math.sqrt(r * r + g * g + bl * bl) * .9), ec = .55 + .45 * amp;
+    return { c: 'rgb(' + Math.round(255 * r / m * ec) + ',' + Math.round(255 * g / m * ec) + ',' + Math.round(255 * bl / m * ec) + ')', a: Math.pow(amp, .8) };
+  }
+  var couleursCue = ['#ff3b30', '#ffd60a', '#30d1d1', '#bf5af2', '#30d158', '#4a5bff'];
+  var cuesMesures = [0, 8, 24, 28, 32, 56];
+
+  // ---------- Platine qui défile (ouverture) ----------
+  (function () {
+    var c = document.getElementById('onde-hero'); if (!c) return;
+    var g = preparer(c), actif = true, depart = performance.now(), bpm = 124, pxTemps = 64;
+    window.addEventListener('resize', function () { g = preparer(c); if (calme) dessiner(48); });
+    visibleALEcran(c, function (v) { actif = v; });
+    var suivants = [['Areia Branca', '11A', 345], ['Kuduro do Bairro', '12A', 15], ['Sol de Abidjan', '10A', 315], ['Maré Alta', '12A', 15], ['Lumière d\'Accra', '11B', 345]];
+    var iSuivant = 0, derniereSection = -1;
+    var hudS = document.getElementById('hud-suivant');
+    function changerSuivant() {
+      iSuivant = (iSuivant + 1) % suivants.length; var s = suivants[iSuivant];
+      hudS.classList.add('change');
+      setTimeout(function () {
+        hudS.innerHTML = '<span class="cle" style="background:hsl(' + s[2] + ',100%,70%)">' + s[1] + '</span><span>Suivant proposé</span><b>' + s[0] + '</b>';
+        hudS.classList.remove('change');
+      }, 450);
+    }
+    function dessiner(pos) {
+      var x = g.x, w = g.w, h = g.h, mi = h / 2, centre = w / 2;
+      x.clearRect(0, 0, w, h);
+      for (var px = 0; px < w; px++) {
+        var b = pos + (px - centre) / pxTemps;
+        var v = son(b), v2 = son(b + .5 / pxTemps);
+        var col = colonne({ l: Math.max(v.l, v2.l), m: Math.max(v.m, v2.m), h: Math.max(v.h, v2.h) });
+        var d = Math.max(.5, col.a * (mi - 16));
+        x.fillStyle = col.c; x.fillRect(px, mi - d, 1.05, 2 * d);
+      }
+      // grille des temps et des mesures
+      var premier = Math.ceil(pos - centre / pxTemps);
+      for (var t = premier; t <= pos + centre / pxTemps; t++) {
+        var gx = centre + (t - pos) * pxTemps, mes = t % 4 === 0;
+        x.fillStyle = mes ? 'rgba(255,255,255,.42)' : 'rgba(255,255,255,.13)';
+        x.fillRect(Math.round(gx), 0, mes ? 1 : .6, h);
+      }
+      // Cue numérotés
+      var m0 = Math.floor((pos - centre / pxTemps) / 4) - 1, m1 = Math.ceil((pos + centre / pxTemps) / 4) + 1;
+      for (var m = m0; m <= m1; m++) {
+        var s = ((m % 64) + 64) % 64, k = cuesMesures.indexOf(s);
+        if (k < 0) continue;
+        var cx = centre + (m * 4 - pos) * pxTemps;
+        x.fillStyle = couleursCue[k]; x.fillRect(Math.round(cx), 0, 1.5, h);
+        x.beginPath(); x.roundRect ? x.roundRect(cx, 0, 20, 17, 3) : x.rect(cx, 0, 20, 17); x.fill();
+        x.fillStyle = '#fff'; x.font = '700 11px -apple-system, Helvetica, Arial'; x.textBaseline = 'middle'; x.fillText(String(k + 1), cx + 6.5, 9);
+      }
+      // tête de lecture
+      x.save(); x.shadowColor = 'rgba(255,255,255,.9)'; x.shadowBlur = 14; x.fillStyle = '#fff'; x.fillRect(Math.round(centre) - 1, 0, 2, h); x.restore();
+      // le copilote propose un nouveau morceau à chaque Cue franchi
+      var sec = Math.floor(pos / 4);
+      var sIdx = cuesMesures.indexOf(((sec % 64) + 64) % 64);
+      if (sIdx >= 0 && sec !== derniereSection) { derniereSection = sec; if (pos > 1) changerSuivant(); }
+    }
+    if (calme) { dessiner(48); return; }
+    (function boucle(now) {
+      if (actif) dessiner(28 + (now - depart) / 1000 * bpm / 60);
+      requestAnimationFrame(boucle);
+    })(performance.now());
   })();
+
+  // ---------- Copilote animé ----------
+  (function () {
+    var morceaux = [
+      ['Noite de Luanda', 'Kiala & Mano Zé', 124, 11, 'A'], ['Areia Branca', 'Dona Lu', 123, 11, 'A'], ['Kuduro do Bairro', 'DJ Mabanza', 125, 12, 'A'],
+      ['Sol de Abidjan', 'Awa Koné', 122, 10, 'A'], ['Tarraxo Lento', 'Neto Silva', 124, 11, 'B'], ['Maré Alta', 'Yuri K.', 126, 12, 'A'],
+      ['Coração Quente', 'Lina Mbaye', 123, 10, 'A'], ['Lumière d\'Accra', 'Ama Mensah', 124, 11, 'B'], ['Kizomba da Ilha', 'Edu Tavares', 122, 1, 'A'],
+      ['Batida Fina', 'Rui Mendes', 125, 12, 'B']
+    ];
+    function teinte(n) { return ((n - 1) * 30 + 165) % 360; }
+    function fond(m) { return 'hsl(' + teinte(m[3]) + ',100%,70%)'; }
+    var liste = document.getElementById('pc-liste'), toast = document.getElementById('pc-toast');
+    var cle = document.getElementById('pc-cle'), infos = document.getElementById('pc-infos');
+    var titre = document.getElementById('pc-titre'), artiste = document.getElementById('pc-artiste'), bpmEl = document.getElementById('pc-bpm');
+    var courant = 0, actif = false, panneau = document.getElementById('panneau');
+    function rendreListe() {
+      liste.innerHTML = '';
+      for (var i = 1; i <= 4; i++) {
+        var m = morceaux[(courant + i) % morceaux.length];
+        var li = document.createElement('li'); li.className = 'ligne'; li.style.animationDelay = (i * 0.08) + 's';
+        li.innerHTML = '<div class="cle-m" style="background:' + fond(m) + '">' + m[3] + m[4] + '</div><div class="infos"><div class="titre-m">' + m[0] +
+          '</div><div class="artiste-m">' + m[1] + (i % 2 ? ' · même ton' : '') + '</div></div><span class="bpm">' + m[2] + '</span><span class="deck">1</span><span class="deck">2</span>';
+        liste.appendChild(li);
+      }
+    }
+    function rendreCourant() {
+      var m = morceaux[courant];
+      cle.textContent = m[3] + m[4]; cle.style.background = fond(m);
+      titre.textContent = m[0]; artiste.textContent = m[1]; bpmEl.textContent = m[2];
+    }
+    rendreCourant(); rendreListe();
+    if (calme) return;
+    visibleALEcran(panneau, function (v) { actif = v; });
+    setInterval(function () {
+      if (!actif) return;
+      var ligne = liste.firstElementChild; if (!ligne) return;
+      ligne.classList.add('choisie');
+      var bouton = ligne.querySelectorAll('.deck')[0];
+      setTimeout(function () { bouton.classList.add('presse'); }, 450);
+      setTimeout(function () {
+        toast.classList.add('vu');
+        infos.classList.add('change');
+        setTimeout(function () { courant = (courant + 1) % morceaux.length; rendreCourant(); infos.classList.remove('change'); rendreListe(); }, 350);
+      }, 900);
+      setTimeout(function () { toast.classList.remove('vu'); }, 2300);
+    }, 3600);
+    // Le panneau se redresse en perspective quand on fait défiler la page.
+    function incliner() {
+      var r = panneau.getBoundingClientRect(), vh = window.innerHeight;
+      var p = Math.min(1, Math.max(0, (vh - r.top) / (vh * .75)));
+      panneau.style.transform = 'rotateX(' + (18 * (1 - p)).toFixed(2) + 'deg) scale(' + (.9 + .1 * p).toFixed(3) + ')';
+    }
+    window.addEventListener('scroll', incliner, { passive: true }); incliner();
+  })();
+
+  // ---------- Démonstration Points Cue ----------
+  (function () {
+    var c = document.getElementById('onde-cue'); if (!c) return;
+    var g = preparer(c), fondOnde = null, actif = false, totalMesures = 64;
+    var touches = { '←': document.getElementById('t-gauche'), '→': document.getElementById('t-droite'), '↩': document.getElementById('t-entree'), 'espace': document.getElementById('t-espace') };
+    var legende = document.getElementById('legende');
+    var cibles = [0, 8, 24, 32, 56], decalages = [0, 2, -2, 3, -1];
+    var cues = [], k = 0, tete = -1;
+    function initialiser() { cues = cibles.map(function (m, i) { return { m: m + decalages[i], cible: m, ok: i === 0 }; }); k = 1; }
+    function fabriquerFond() {
+      var cv = document.createElement('canvas'), d = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(g.w * d); cv.height = Math.round(g.h * d);
+      var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0);
+      var mi = g.h / 2, tempsParPx = totalMesures * 4 / g.w;
+      for (var px = 0; px < g.w; px++) {
+        var l = 0, m = 0, h = 0;
+        for (var s = 0; s < 6; s++) { var v = son(px * tempsParPx + s * tempsParPx / 6); l = Math.max(l, v.l); m = Math.max(m, v.m); h = Math.max(h, v.h); }
+        var col = colonne({ l: l, m: m, h: h }), dd = Math.max(.5, col.a * (mi - 20));
+        x.fillStyle = col.c; x.fillRect(px, mi - dd + 6, 1.05, 2 * dd - 6);
+      }
+      for (var mes = 0; mes <= totalMesures; mes += 4) { x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(Math.round(mes / totalMesures * g.w), 0, .6, g.h); }
+      fondOnde = cv;
+    }
+    function appuyer(nom) { var t = touches[nom]; if (!t) return; t.classList.add('appuyee'); setTimeout(function () { t.classList.remove('appuyee'); }, 220); }
+    function dessiner(pulsation) {
+      var x = g.x, w = g.w, h = g.h;
+      x.clearRect(0, 0, w, h);
+      if (fondOnde) x.drawImage(fondOnde, 0, 0, w, h);
+      if (tete >= 0) { var tx = tete / totalMesures * w; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillRect(tx, 0, 1.5, h); }
+      cues.forEach(function (q, i) {
+        var cx = q.m / totalMesures * w, col = couleursCue[i];
+        var enCours = i === k && !q.ok;
+        x.globalAlpha = i > k && !q.ok ? .35 : 1;
+        if (enCours) { x.save(); x.shadowColor = col; x.shadowBlur = 12 + 8 * pulsation; }
+        x.fillStyle = col; x.fillRect(Math.round(cx), 0, enCours ? 2 : 1.5, h);
+        x.beginPath(); x.roundRect ? x.roundRect(cx, 0, q.ok ? 30 : 20, 18, 3) : x.rect(cx, 0, 20, 18); x.fill();
+        if (enCours) x.restore();
+        x.fillStyle = '#fff'; x.font = '700 11px -apple-system, Helvetica, Arial'; x.textBaseline = 'middle';
+        x.fillText(String(i + 1) + (q.ok ? ' ✓' : ''), cx + 6, 9.5);
+        x.globalAlpha = 1;
+      });
+    }
+    initialiser(); fabriquerFond(); dessiner(0);
+    window.addEventListener('resize', function () { g = preparer(c); fabriquerFond(); dessiner(0); });
+    if (calme) { cues.forEach(function (q) { q.m = q.cible; q.ok = true; }); dessiner(0); return; }
+    visibleALEcran(c, function (v) { actif = v; });
+    var prochain = 0, attente = 0, ecoute = 0;
+    (function boucle(now) {
+      requestAnimationFrame(boucle);
+      if (!actif) return;
+      var puls = (Math.sin(now / 180) + 1) / 2;
+      if (tete >= 0) { tete += 0.035; if (tete > ecoute + 3) tete = -1; }
+      if (now >= prochain) {
+        if (k >= cues.length) { // tout est validé : on recommence
+          if (!attente) { attente = now + 2200; legende.textContent = 'Tous les Cue sont calés. Il ne reste qu\'à les écrire dans le fichier.'; }
+          if (now >= attente) { attente = 0; initialiser(); legende.textContent = '→ une mesure plus tard · espace pour écouter · ↩︎ pour valider'; }
+          prochain = now + 400;
+        } else {
+          var q = cues[k];
+          if (q.m !== q.cible) {
+            var sens = q.cible > q.m ? 1 : -1; q.m += sens; appuyer(sens > 0 ? '→' : '←');
+            legende.textContent = sens > 0 ? '→ une mesure plus tard' : '← une mesure plus tôt';
+            prochain = now + 520;
+          } else if (tete < 0 && ecoute !== q.m) {
+            ecoute = q.m; tete = q.m; appuyer('espace'); legende.textContent = 'espace : on écoute depuis le Cue… pile sur le temps.';
+            prochain = now + 1300;
+          } else {
+            q.ok = true; appuyer('↩'); legende.textContent = '↩︎ validé. Cue suivant.'; k++; prochain = now + 900;
+          }
+        }
+      }
+      dessiner(puls);
+    })(performance.now());
+  })();
+
+  // ---------- Tuiles : compteur et validation par lots ----------
+  (function () {
+    var compteur = document.querySelector('.compteur');
+    var barre = document.getElementById('lot-barre'), compte = document.getElementById('lot-compte'), texte = document.getElementById('lot-texte');
+    function compterJusqua(el, n) { if (calme) { el.textContent = n; return; } var i = 0; var t = setInterval(function () { el.textContent = ++i; if (i >= n) clearInterval(t); }, 110); }
+    function lot() {
+      if (calme) { barre.style.width = '100%'; compte.textContent = '640 / 640'; texte.textContent = '✓ Validation terminée'; return; }
+      var total = 640, debut = performance.now(), duree = 4200;
+      (function pas(now) {
+        var p = Math.min(1, (now - debut) / duree), e = 1 - Math.pow(1 - p, 2);
+        barre.style.width = (e * 100) + '%'; compte.textContent = Math.round(e * total) + ' / ' + total;
+        texte.textContent = p < 1 ? 'Validation…' : '✓ Validation terminée';
+        if (p < 1) requestAnimationFrame(pas); else setTimeout(function () { debut = performance.now(); requestAnimationFrame(pas); }, 2600);
+      })(debut);
+    }
+    if (!('IntersectionObserver' in window)) { compterJusqua(compteur, 8); lot(); return; }
+    new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { compterJusqua(compteur, 8); o.disconnect(); } }, { threshold: .4 }).observe(compteur);
+    new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { lot(); o.disconnect(); } }, { threshold: .4 }).observe(barre);
+  })();
+})();
 </script>
 </body>
 </html>
