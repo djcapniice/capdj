@@ -4,87 +4,259 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CapDJ — le copilote du DJ</title>
-<meta name="description" content="CapDJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau à jouer, chargé sur la platine en un clic, et des points Cue calés selon la structure de vos morceaux. Gratuit.">
+<meta name="description" content="CapDJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau chargé sur la platine en un clic, et des points Cue calés selon la structure de vos morceaux. Gratuit.">
+<meta property="og:title" content="CapDJ — le copilote du DJ">
+<meta property="og:description" content="Le prochain morceau, chargé en un clic. Des points Cue calés à la mesure près. Gratuit, pour Mac.">
+<meta property="og:image" content="https://djcapniice.github.io/capdj/images/points-cue.png">
 <style>
   :root {
-    --fond: #0d0d10; --carte: #17171c; --filet: #26262d; --texte: #f2f2f5; --doux: #a3a3ad;
-    --accent: #ff9f0a; --accent-fonce: #cc7a00;
+    --texte: #1d1d1f; --doux: #6e6e73; --clair: #f5f5f7; --blanc: #fff;
+    --bleu: #0071e3; --bleu-survol: #0077ed; --lien: #0066cc;
+    --noir: #000; --texte-nuit: #f5f5f7; --doux-nuit: #86868b; --lien-nuit: #2997ff;
+    --police: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--fond); color: var(--texte);
-    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--blanc); color: var(--texte); font: 17px/1.47 var(--police); letter-spacing: -0.022em; -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; display: block; }
+  a { color: var(--lien); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Barre de navigation */
+  nav {
+    position: sticky; top: 0; z-index: 10; height: 48px;
+    background: rgba(251, 251, 253, 0.8); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
-  main { max-width: 920px; margin: 0 auto; padding: 56px 16px 72px; }
-  header { text-align: center; }
-  .logo { font-size: 56px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
-  .logo span { color: var(--accent); }
-  .accroche { font-size: 22px; margin: 6px 0 4px; }
-  .signature { color: var(--doux); margin: 0 0 28px; }
-  .bouton {
-    display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #111;
-    font-weight: 700; font-size: 18px; padding: 15px 28px; border-radius: 999px; text-decoration: none;
+  nav .dedans { max-width: 1024px; height: 100%; margin: 0 auto; padding: 0 22px; display: flex; align-items: center; gap: 28px; }
+  nav .marque { font-weight: 600; font-size: 21px; letter-spacing: -0.02em; color: var(--texte); margin-right: auto; }
+  nav .marque:hover { text-decoration: none; }
+  nav .liens a { color: var(--texte); font-size: 12px; opacity: 0.85; margin-left: 24px; }
+  nav .liens a:hover { opacity: 1; text-decoration: none; }
+  .pilule { display: inline-block; background: var(--bleu); color: #fff; border-radius: 980px; font-weight: 400; }
+  .pilule:hover { background: var(--bleu-survol); text-decoration: none; }
+  nav .pilule { font-size: 12px; padding: 4px 11px; }
+
+  /* Sections */
+  section { padding: 100px 22px; }
+  .centre { max-width: 980px; margin: 0 auto; text-align: center; }
+  .large { max-width: 1120px; margin: 0 auto; }
+  .surtitre { font-size: 21px; font-weight: 600; color: #bf4800; margin: 0 0 6px; letter-spacing: 0.011em; }
+  h1 { font-size: 96px; line-height: 1.04; font-weight: 600; letter-spacing: -0.03em; margin: 0; }
+  .sous-titre { font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; margin: 8px 0 18px;
+    background: linear-gradient(90deg, #ff6b00, #ff2d55 45%, #af52de 80%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h2 { font-size: 64px; line-height: 1.06; font-weight: 600; letter-spacing: -0.028em; margin: 0 0 20px; }
+  .chapo { font-size: 24px; line-height: 1.34; font-weight: 500; color: var(--doux); max-width: 760px; margin: 0 auto; letter-spacing: 0.005em; }
+  .actions { display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+  .actions .pilule { font-size: 17px; padding: 12px 24px; }
+  .actions .lien { font-size: 17px; }
+  .petit { font-size: 14px; color: var(--doux); margin-top: 18px; letter-spacing: -0.01em; }
+
+  /* Fenêtre Mac autour des captures */
+  .fenetre { border-radius: 12px; overflow: hidden; background: #1e1e22; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.18); }
+  .fenetre .barre { height: 28px; background: #2a2a2f; display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+  .fenetre .barre i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .fenetre .barre i:nth-child(1) { background: #ff5f57; } .fenetre .barre i:nth-child(2) { background: #febc2e; } .fenetre .barre i:nth-child(3) { background: #28c840; }
+  .hero-image { margin: 70px auto 0; max-width: 1000px; }
+
+  /* Section noire : le copilote */
+  .nuit { background: var(--noir); color: var(--texte-nuit); }
+  .nuit .chapo { color: var(--doux-nuit); }
+  .nuit a { color: var(--lien-nuit); }
+  .copilote { display: grid; grid-template-columns: 1fr 360px; gap: 70px; align-items: center; max-width: 1000px; margin: 0 auto; }
+  .copilote h2 { text-align: left; }
+  .copilote .chapo { margin: 0; text-align: left; }
+  .points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 44px; }
+  .points h3 { font-size: 17px; margin: 0 0 4px; color: var(--texte-nuit); }
+  .points p { margin: 0; font-size: 15px; color: var(--doux-nuit); line-height: 1.45; }
+  .panneau { max-width: 360px; justify-self: center; }
+
+  /* Tuiles */
+  .gris { background: var(--clair); }
+  .tuiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 1024px; margin: 60px auto 0; }
+  .tuile { background: var(--blanc); border-radius: 28px; padding: 40px 36px; text-align: left; grid-column: span 2; display: flex; flex-direction: column; }
+  .tuile.moitie { grid-column: span 3; }
+  .tuile.entiere { grid-column: span 6; padding: 44px 44px 0; }
+  .tuile .titre { font-size: 28px; line-height: 1.14; font-weight: 600; letter-spacing: -0.016em; margin: 0 0 10px; }
+  .tuile p { margin: 0; color: var(--doux); font-size: 17px; }
+  .tuile .grand { font-size: 80px; line-height: 1; font-weight: 700; letter-spacing: -0.04em; margin: 4px 0 12px;
+    background: linear-gradient(135deg, #cc0000, #cccc00 30%, #00cc00 50%, #00cccc 65%, #0000cc 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .touches { margin-top: auto; padding-top: 22px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .touche { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 10px; border-radius: 9px;
+    background: var(--clair); border: 1px solid #d2d2d7; font-size: 15px; font-weight: 500; color: var(--texte); box-shadow: 0 1px 0 #d2d2d7; }
+  .onde { margin-top: 30px; border-radius: 14px 14px 0 0; overflow: hidden; background: #000; }
+
+  /* Installation */
+  .etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1024px; margin: 60px auto 0; text-align: left; }
+  .etape { background: var(--clair); border-radius: 22px; padding: 30px 26px; }
+  .etape .num { font-size: 40px; font-weight: 700; color: #bf4800; line-height: 1; margin-bottom: 14px; }
+  .etape h3 { font-size: 19px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .etape p { margin: 0; font-size: 15px; color: var(--doux); line-height: 1.45; }
+  .remarque { max-width: 760px; margin: 40px auto 0; font-size: 14px; color: var(--doux); }
+
+  /* Fin */
+  .fin h2 { font-size: 56px; }
+  footer { background: var(--clair); color: var(--doux); font-size: 12px; line-height: 1.5; padding: 22px; }
+  footer .dedans { max-width: 980px; margin: 0 auto; border-top: 1px solid #d2d2d7; padding-top: 16px; }
+  footer p { margin: 0 0 8px; }
+
+  /* Apparition au défilement (seulement si le JavaScript tourne) */
+  .js .apparait { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s cubic-bezier(.2, .7, .2, 1); }
+  .js .apparait.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .js .apparait { opacity: 1; transform: none; transition: none; } }
+
+  /* Tablette */
+  @media (max-width: 1068px) {
+    h1 { font-size: 80px; } h2 { font-size: 48px; } .sous-titre { font-size: 32px; } .chapo { font-size: 21px; }
+    .copilote { grid-template-columns: 1fr 300px; gap: 40px; }
+    .tuile .titre { font-size: 24px; }
+    .etapes { grid-template-columns: repeat(2, 1fr); }
   }
-  .bouton:hover { background: #ffb340; }
-  .info { color: var(--doux); font-size: 14px; margin-top: 12px; }
-  figure { margin: 40px 0 0; }
-  figure img { width: 100%; border-radius: 14px; border: 1px solid var(--filet); display: block; }
-  figcaption { color: var(--doux); font-size: 14px; text-align: center; margin-top: 10px; }
-  h2 { font-size: 26px; margin: 56px 0 18px; }
-  .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-  .carte { background: var(--carte); border: 1px solid var(--filet); border-radius: 14px; padding: 18px 20px; }
-  .carte h3 { margin: 0 0 6px; font-size: 17px; }
-  .carte p { margin: 0; color: var(--doux); font-size: 15px; }
-  ol { padding-left: 22px; }
-  ol li { margin: 8px 0; }
-  code, .touche { background: var(--carte); border: 1px solid var(--filet); border-radius: 6px; padding: 1px 6px; font-size: 14px; }
-  .note { background: var(--carte); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 16px; color: var(--doux); }
-  footer { margin-top: 64px; color: var(--doux); font-size: 13px; text-align: center; }
-  footer a { color: var(--doux); }
-  @media (max-width: 520px) { .logo { font-size: 44px; } .accroche { font-size: 19px; } }
+  /* Téléphone */
+  @media (max-width: 734px) {
+    nav .liens { display: none; }
+    section { padding: 70px 16px; }
+    h1 { font-size: 56px; } h2 { font-size: 36px; } .sous-titre { font-size: 26px; } .chapo { font-size: 19px; }
+    .hero-image { margin-top: 44px; }
+    .copilote { grid-template-columns: 1fr; gap: 40px; }
+    .copilote h2, .copilote .chapo { text-align: center; }
+    .points { grid-template-columns: 1fr; text-align: center; }
+    .tuiles { grid-template-columns: 1fr; }
+    .tuile, .tuile.moitie, .tuile.entiere { grid-column: span 1; padding: 32px 26px; }
+    .tuile.entiere { padding-bottom: 0; }
+    .tuile .grand { font-size: 64px; }
+    .etapes { grid-template-columns: 1fr; }
+    .fin h2 { font-size: 36px; }
+  }
 </style>
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
-<main>
-  <header>
-    <p class="logo">Cap<span>DJ</span></p>
-    <p class="accroche">Le copilote du DJ, à côté de Serato DJ Pro.</p>
-    <p class="signature">par DJ Cap Niice · gratuit · version bêta</p>
-    <a class="bouton" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-      Télécharger pour Mac
-    </a>
-    <p class="info">macOS 14 ou plus récent · Mac Apple Silicon ou Intel · Serato DJ Pro 4</p>
-  </header>
 
-  <figure>
-    <img src="onde.png" alt="La forme d'onde de CapDJ, avec la grille des temps et les points Cue numérotés">
-    <figcaption>Points Cue : la forme d'onde en couleurs, la grille des temps et vos Cue, calés à l'oreille.</figcaption>
-  </figure>
-
-  <h2>Ce que fait CapDJ</h2>
-  <div class="grille">
-    <div class="carte"><h3>Le prochain morceau</h3><p>CapDJ suit ce que vous jouez et propose la suite, à partir de votre bibliothèque, de vos bacs et de vos habitudes de soirée.</p></div>
-    <div class="carte"><h3>Sur la platine en un clic</h3><p>Boutons 1 et 2 : le morceau choisi se charge directement sur la platine de Serato.</p></div>
-    <div class="carte"><h3>À découvrir</h3><p>Des titres Apple Music que vous n'avez encore jamais joués, proposés à part.</p></div>
-    <div class="carte"><h3>Points Cue</h3><p>Des Cue placés selon la structure du morceau (intro, couplet, refrain…). Vous écoutez, vous décalez d'une mesure au clavier, vous validez.</p></div>
-    <div class="carte"><h3>Par lots</h3><p>Validez un dossier, un bac ou une sélection en une fois. Vos propres Cue sont gardés, et « Remettre comme avant » reste toujours possible.</p></div>
-    <div class="carte"><h3>Rien à importer</h3><p>CapDJ lit votre bibliothèque Serato telle quelle, sans jamais modifier sa base de données.</p></div>
+<nav>
+  <div class="dedans">
+    <a class="marque" href="#">CapDJ</a>
+    <div class="liens">
+      <a href="#copilote">Copilote</a>
+      <a href="#points-cue">Points Cue</a>
+      <a href="#installation">Installation</a>
+    </div>
+    <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger</a>
   </div>
+</nav>
 
-  <h2>Installation</h2>
-  <ol>
-    <li>Ouvrez <strong>CapDJ.dmg</strong> et glissez CapDJ dans le dossier Applications.</li>
-    <li>Ouvrez CapDJ. macOS indique qu'il ne peut pas vérifier l'app : cliquez sur « Terminé ».</li>
-    <li>Allez dans <strong>Réglages Système › Confidentialité et sécurité</strong>. En bas, à côté de « CapDJ a été bloqué », cliquez sur <strong>« Ouvrir quand même »</strong>. Cette étape ne se fait qu'une fois.</li>
-    <li>Dans CapDJ, cliquez sur « Autoriser », puis activez CapDJ dans <strong>Confidentialité et sécurité › Accessibilité</strong>. C'est ce qui permet de charger les morceaux sur les platines.</li>
-  </ol>
-  <p class="note">CapDJ n'est pas encore signé par Apple, d'où l'étape « Ouvrir quand même ». L'app ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
+<section>
+  <div class="centre">
+    <p class="surtitre">Nouveau · gratuit</p>
+    <h1>CapDJ</h1>
+    <p class="sous-titre">Le copilote du DJ.</p>
+    <p class="chapo">Le prochain morceau, chargé sur la platine en un clic. Des points Cue calés à la mesure près. Juste à côté de Serato DJ Pro.</p>
+    <div class="actions">
+      <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
+      <a class="lien" href="#installation">Comment l'installer ›</a>
+    </div>
+    <p class="petit">par DJ Cap Niice · macOS 14 ou plus récent · Apple Silicon et Intel</p>
+  </div>
+  <div class="hero-image apparait">
+    <div class="fenetre"><div class="barre"><i></i><i></i><i></i></div><img src="images/points-cue.png" alt="La fenêtre Points Cue de CapDJ : forme d'onde en couleurs, grille des temps et Cue numérotés" width="2000" height="1280"></div>
+  </div>
+</section>
 
-  <footer>
+<section class="nuit" id="copilote">
+  <div class="copilote">
+    <div class="apparait">
+      <h2>Le prochain morceau.<br>Toujours prêt.</h2>
+      <p class="chapo">CapDJ suit ce que vous jouez et propose la suite, en accord avec la tonalité et le tempo. Il apprend de vos soirées : les enchaînements que vous aimez remontent en premier.</p>
+    </div>
+    <div class="panneau apparait">
+      <div class="fenetre"><div class="barre"><i></i><i></i><i></i></div><img src="images/copilote.png" alt="Le copilote CapDJ : le morceau en cours et les suggestions, avec les boutons 1 et 2" width="640" height="800"></div>
+    </div>
+  </div>
+  <div class="points large" style="max-width:1000px">
+    <div class="apparait"><h3>Votre bibliothèque</h3><p>Vos morceaux, vos bacs et votre historique Serato, lus tels quels. Rien à importer.</p></div>
+    <div class="apparait"><h3>Platines 1 et 2</h3><p>Un clic, et le morceau se charge sur la platine choisie dans Serato.</p></div>
+    <div class="apparait"><h3>À découvrir</h3><p>Des titres Apple Music que vous n'avez encore jamais joués, proposés à part.</p></div>
+  </div>
+</section>
+
+<section class="gris" id="points-cue">
+  <div class="centre apparait">
+    <h2>Vos Cue,<br>à la mesure près.</h2>
+    <p class="chapo">CapDJ repère la structure de chaque morceau et place les Cue là où ça compte. Vous écoutez, vous ajustez au clavier, vous validez.</p>
+  </div>
+  <div class="tuiles">
+    <div class="tuile apparait">
+      <p class="titre">La structure, repérée pour vous.</p>
+      <p>Intro, couplet, montée, refrain, break, outro : chaque partie a sa couleur, comme dans Serato.</p>
+    </div>
+    <div class="tuile apparait">
+      <p class="grand">8</p>
+      <p class="titre">Cue par morceau.</p>
+      <p>Vos propres Cue restent à leur place. CapDJ ne remplit que les emplacements libres.</p>
+    </div>
+    <div class="tuile apparait">
+      <p class="titre">Calés à l'oreille.</p>
+      <p>Une mesure plus tôt, un temps plus tard : vous entendez le résultat aussitôt.</p>
+      <div class="touches"><span class="touche">←</span><span class="touche">→</span><span class="touche">⌥</span><span class="touche">↩︎</span></div>
+    </div>
+    <div class="tuile moitie apparait">
+      <p class="titre">Un dossier entier, en une fois.</p>
+      <p>Validez une sélection, un bac ou toute une bibliothèque. Les morceaux déjà calés ne sont jamais retouchés.</p>
+    </div>
+    <div class="tuile moitie apparait">
+      <p class="titre">Rien n'est définitif.</p>
+      <p>Chaque fichier est sauvegardé avant d'être modifié. « Remettre comme avant » le rend exactement tel qu'il était.</p>
+    </div>
+    <div class="tuile entiere apparait">
+      <p class="titre">Une forme d'onde qui se lit d'un coup d'œil.</p>
+      <p>Basses en rouge, médiums en vert, aigus en bleu. La grille des temps et les Cue numérotés tombent pile sur la musique.</p>
+      <div class="onde"><img src="onde.png" alt="Forme d'onde en couleurs avec la grille des temps et un Cue numéroté" width="1250" height="370"></div>
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="centre apparait">
+    <h2>Installé en deux minutes.</h2>
+    <p class="chapo">Gratuit, sans compte et sans abonnement. CapDJ ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
+  </div>
+  <div class="etapes">
+    <div class="etape apparait"><div class="num">1</div><h3>Téléchargez</h3><p>Ouvrez <strong>CapDJ.dmg</strong> et glissez CapDJ dans le dossier Applications.</p></div>
+    <div class="etape apparait"><div class="num">2</div><h3>Ouvrez</h3><p>Lancez CapDJ. Si macOS affiche qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
+    <div class="etape apparait"><div class="num">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : cliquez sur « Ouvrir quand même ». Une seule fois.</p></div>
+    <div class="etape apparait"><div class="num">4</div><h3>Jouez</h3><p>Dans CapDJ, cliquez sur « Autoriser » puis activez CapDJ dans Accessibilité pour charger sur les platines.</p></div>
+  </div>
+  <p class="remarque centre">CapDJ n'est pas encore signé par Apple, d'où l'étape 3. Il faut macOS 14 ou plus récent et Serato DJ Pro 4.</p>
+</section>
+
+<section class="gris fin">
+  <div class="centre apparait">
+    <h2>Gratuit. Pour tous les DJ.</h2>
+    <p class="chapo">Fait par un DJ, pour les DJ.</p>
+    <div class="actions">
+      <a class="pilule" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
+      <a class="lien" href="https://github.com/djcapniice/capdj/releases">Toutes les versions ›</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="dedans">
+    <p>CapDJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited. Apple Music, Mac et macOS sont des marques d'Apple Inc.</p>
     <p>CapDJ © 2026 DJ Cap Niice. Gratuit pour un usage personnel.</p>
-    <p>CapDJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited.</p>
-  </footer>
-</main>
+  </div>
+</footer>
+
+<script>
+  // Les blocs apparaissent en douceur quand on les fait défiler.
+  (function () {
+    var blocs = document.querySelectorAll('.apparait');
+    if (!('IntersectionObserver' in window)) { blocs.forEach(function (b) { b.classList.add('visible'); }); return; }
+    var obs = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    blocs.forEach(function (b) { obs.observe(b); });
+  })();
+</script>
 </body>
 </html>
