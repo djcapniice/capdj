@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAP DJ — le copilote du DJ</title>
+<meta name="description" content="CAP DJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau chargé sur la platine en un clic, et des points Cue calés à la mesure près. Gratuit.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="CAP DJ — le copilote du DJ">
+<meta property="og:description" content="Le prochain morceau, chargé en un clic. Des points Cue calés à la mesure près. Gratuit, pour Mac.">
+<meta property="og:image" content="https://djcapniice.github.io/capdj/partage.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --noir: #000; --tuile: #0f0f11; --tuile2: #1c1c1e; --filet: rgba(255,255,255,.09);
+    --blanc: #f5f5f7; --gris: #a1a1a6; --faible: #6e6e73; --rose: #ff375f; --rose-fonce: #c2163d;
+    --police: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--noir); }
+  body { margin: 0; background: var(--noir); color: var(--blanc); font: 17px/1.47 var(--police); letter-spacing: -0.022em;
+         -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: var(--rose); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .rose { color: var(--rose); }
+
+  /* Logo : symbole + « CAP » demi-gras + « DJ » régulier */
+  .logo { display: inline-flex; align-items: center; gap: .32em; color: var(--blanc); white-space: nowrap; }
+  .logo svg { height: 1.2em; width: auto; flex: none; overflow: visible; }
+  .logo .mot { letter-spacing: -0.02em; line-height: 1; }
+  .logo .mot b { font-weight: 700; }
+  .logo .mot span { font-weight: 400; }
+  .logo:hover { text-decoration: none; }
+
+  /* ---------- Navigation ---------- */
+  nav { position: fixed; inset: 0 0 auto 0; z-index: 20; height: 52px; background: rgba(0,0,0,.66);
+        backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--filet); }
+  nav .dedans { max-width: 1024px; height: 100%; margin: 0 auto; padding: 0 22px; display: flex; align-items: center; gap: 26px; }
+  nav .logo { font-size: 19px; margin-right: auto; }
+  nav .liens a { color: var(--blanc); opacity: .78; font-size: 12px; margin-left: 22px; transition: opacity .2s; }
+  nav .liens a:hover { opacity: 1; text-decoration: none; }
+  .cta { display: inline-flex; align-items: center; gap: 9px; color: #fff; font-weight: 600; border-radius: 980px; background: var(--rose);
+         box-shadow: 0 10px 36px rgba(255,55,95,.38); transition: transform .25s ease, box-shadow .25s ease, background .25s; }
+  .cta:hover { text-decoration: none; background: #ff4d71; transform: translateY(-2px); box-shadow: 0 16px 48px rgba(255,55,95,.55); }
+  nav .cta { font-size: 12px; padding: 6px 14px; box-shadow: none; }
+
+  /* ---------- Ouverture ---------- */
+  .hero { position: relative; min-height: 100vh; padding: 132px 22px 60px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+  .lueur { position: absolute; left: 50%; top: 32%; width: 1100px; height: 760px; transform: translate(-50%, -50%); pointer-events: none; filter: blur(110px); opacity: .5; }
+  .lueur i { position: absolute; border-radius: 50%; }
+  .lueur i:nth-child(1) { width: 560px; height: 560px; left: 8%; top: 12%; background: var(--rose); animation: flotte1 16s ease-in-out infinite alternate; }
+  .lueur i:nth-child(2) { width: 480px; height: 480px; right: 6%; top: 22%; background: var(--rose-fonce); animation: flotte2 20s ease-in-out infinite alternate; }
+  .lueur i:nth-child(3) { width: 300px; height: 300px; left: 42%; top: 0; background: #fff; opacity: .18; animation: flotte3 24s ease-in-out infinite alternate; }
+  @keyframes flotte1 { to { transform: translate(160px, 60px) scale(1.12); } }
+  @keyframes flotte2 { to { transform: translate(-170px, 90px) scale(.9); } }
+  @keyframes flotte3 { to { transform: translate(-60px, 120px) scale(1.3); } }
+  .hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 280px; background: linear-gradient(transparent, #000); pointer-events: none; }
+  .hero-texte { position: relative; z-index: 2; text-align: center; max-width: 900px; }
+  .surtitre { display: inline-block; font-size: 14px; font-weight: 600; color: var(--blanc); padding: 6px 14px; border-radius: 980px;
+              background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(10px); margin: 0 0 30px; }
+  .surtitre i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--rose); margin-right: 8px; vertical-align: 1px; box-shadow: 0 0 10px var(--rose); }
+  h1 { margin: 0; font-size: 124px; line-height: 1; }
+  h1 .logo { gap: .26em; }
+  h1 .logo svg { height: 1.06em; }
+  h1 .trace { stroke-dasharray: 1; }
+  .slogan { font-size: 46px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; margin: 22px 0 20px; color: var(--blanc); }
+  .slogan .rose { position: relative; }
+  .chapo { font-size: 22px; line-height: 1.38; color: var(--gris); font-weight: 500; letter-spacing: .004em; max-width: 680px; margin: 0 auto; }
+  .chapo strong { color: var(--blanc); font-weight: 600; }
+  .actions { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 34px; flex-wrap: wrap; }
+  .actions .cta { font-size: 18px; padding: 15px 30px; }
+  .actions .lien { font-size: 18px; }
+  .petit { font-size: 13px; color: var(--faible); margin-top: 20px; letter-spacing: 0; }
+
+  /* La platine (d'après la charte : fenêtre sombre, onde grise, tête de lecture rose) */
+  .platine { position: relative; z-index: 2; width: min(1000px, 100%); margin-top: 70px; }
+  .fenetre { border-radius: 22px; background: #1c1c1e; border: 1px solid rgba(255,255,255,.08); overflow: hidden;
+             box-shadow: 0 50px 140px rgba(0,0,0,.7), 0 0 120px rgba(255,55,95,.12); }
+  .fenetre .barre { height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .fenetre .barre i { width: 12px; height: 12px; border-radius: 50%; }
+  .fenetre .barre i:nth-child(1) { background: #ff5f57; } .fenetre .barre i:nth-child(2) { background: #febc2e; } .fenetre .barre i:nth-child(3) { background: #28c840; }
+  .lecture { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 24px; padding: 26px 28px 22px; }
+  .bouton-lecture { width: 76px; height: 64px; border-radius: 14px; background: #2c2c2e; display: grid; place-items: center; }
+  .bouton-lecture svg { width: 26px; height: 26px; }
+  .milieu-lecture .etiq { font-size: 19px; font-weight: 600; margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
+  .milieu-lecture .etiq small { font-size: 14px; color: var(--gris); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .milieu-lecture canvas { display: block; width: 100%; height: 78px; }
+  .pastille-bpm { font-size: 20px; font-weight: 700; padding: 12px 18px; border-radius: 12px; background: #2c2c2e; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .suivant { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 28px; padding: 18px 0 22px; border-top: 1px solid rgba(255,255,255,.1); font-size: 18px; }
+  .suivant .nom { display: flex; gap: 12px; align-items: baseline; min-width: 0; transition: opacity .45s, transform .45s; }
+  .suivant .nom.change { opacity: 0; transform: translateY(6px); }
+  .suivant .nom b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .suivant .nom small { color: var(--gris); font-size: 14px; white-space: nowrap; }
+  .suivant svg { width: 18px; height: 18px; flex: none; }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; padding: 130px 22px; }
+  .centre { max-width: 980px; margin: 0 auto; text-align: center; }
+  .etiquette { font-size: 17px; font-weight: 600; margin: 0 0 12px; color: var(--rose); }
+  h2 { font-size: 72px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; margin: 0 0 22px; }
+  h2 .gris { color: var(--gris); }
+
+  /* Copilote */
+  .copilote { display: grid; grid-template-columns: 1fr 420px; gap: 80px; align-items: center; max-width: 1060px; margin: 0 auto; }
+  .copilote .texte h2, .copilote .texte .chapo { text-align: left; margin-left: 0; }
+  .avantages { list-style: none; padding: 0; margin: 34px 0 0; display: grid; gap: 18px; }
+  .avantages li { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: start; color: var(--gris); font-size: 16px; }
+  .avantages li b { display: block; color: var(--blanc); font-size: 17px; }
+  .avantages .ico { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--tuile2); border: 1px solid var(--filet); }
+  .avantages .ico svg { width: 18px; height: 18px; }
+  .scene { perspective: 1400px; }
+  .panneau { position: relative; border-radius: 26px; padding: 16px; background: rgba(28,28,30,.82); border: 1px solid rgba(255,255,255,.12);
+             backdrop-filter: blur(30px); box-shadow: 0 50px 120px rgba(0,0,0,.7); transform-origin: 50% 100%; will-change: transform; }
+  .panneau::before { content: ""; position: absolute; inset: -40px; z-index: -1; border-radius: 60px; filter: blur(70px); opacity: .35;
+                     background: radial-gradient(circle at 35% 35%, var(--rose), transparent 60%); }
+  .onglets { display: flex; gap: 4px; padding: 3px; border-radius: 980px; background: rgba(255,255,255,.06); margin-bottom: 12px; font-size: 13px; }
+  .onglets span { flex: 1; text-align: center; padding: 6px; border-radius: 980px; color: var(--gris); }
+  .onglets .actif { background: rgba(255,255,255,.14); color: var(--blanc); font-weight: 600; }
+  .en-cours { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,.07); border: 1px solid var(--filet); margin-bottom: 10px; }
+  .en-cours .infos { flex: 1; min-width: 0; transition: opacity .35s, transform .35s; }
+  .en-cours .infos.change { opacity: 0; transform: translateX(-10px); }
+  .titre-m { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .artiste-m { color: var(--gris); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cle-m { flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 14px; color: #111; transition: background .5s; }
+  .bpm-m { text-align: right; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bpm-m small { display: block; font-size: 10px; font-weight: 600; color: var(--gris); }
+  .liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; min-height: 248px; }
+  .ligne { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 14px; background: rgba(255,255,255,.045);
+           animation: entre .55s cubic-bezier(.2,.8,.2,1) both; transition: background .3s, transform .3s; }
+  .ligne .cle-m { width: 34px; height: 34px; font-size: 11px; border-radius: 9px; }
+  .ligne .infos { flex: 1; min-width: 0; }
+  .ligne .titre-m { font-size: 14px; } .ligne .artiste-m { font-size: 12px; }
+  .ligne .bpm { color: var(--gris); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 14px; }
+  .deck { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff;
+          background: rgba(255,55,95,.78); transition: transform .2s, box-shadow .2s, background .2s; }
+  .ligne.choisie { background: rgba(255,55,95,.14); transform: scale(1.02); }
+  .deck.presse { transform: scale(.85); background: #fff; color: var(--rose); box-shadow: 0 0 0 6px rgba(255,55,95,.3), 0 0 26px rgba(255,55,95,.85); }
+  @keyframes entre { from { opacity: 0; transform: translateY(14px); } }
+  .toast { position: absolute; left: 50%; bottom: -18px; transform: translate(-50%, 10px); opacity: 0; white-space: nowrap; font-size: 13px; font-weight: 600;
+           padding: 8px 14px; border-radius: 980px; background: rgba(28,28,30,.9); color: var(--blanc); border: 1px solid rgba(255,55,95,.45); backdrop-filter: blur(10px);
+           transition: opacity .35s, transform .35s; }
+  .toast i { color: var(--rose); font-style: normal; }
+  .toast.vu { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Points Cue */
+  .demo { max-width: 1060px; margin: 64px auto 0; border-radius: 28px; padding: 26px 26px 22px; background: var(--tuile); border: 1px solid var(--filet); }
+  .demo canvas { display: block; width: 100%; height: 210px; border-radius: 14px; background: #000; }
+  .clavier { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .touche { min-width: 46px; height: 46px; padding: 0 12px; display: inline-grid; place-items: center; border-radius: 11px; font-size: 18px; font-weight: 600; color: var(--blanc);
+            background: linear-gradient(180deg, #2a2a2e, #1c1c1f); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 3px 0 #0a0a0c, inset 0 1px 0 rgba(255,255,255,.08);
+            transition: transform .12s, box-shadow .12s, background .12s, color .12s; }
+  .touche.appuyee { transform: translateY(3px); box-shadow: 0 0 0 #0a0a0c, 0 0 26px rgba(255,55,95,.6); background: var(--rose); color: #fff; }
+  .clavier .sep { width: 1px; height: 26px; background: var(--filet); margin: 0 6px; }
+  .legende { text-align: center; color: var(--gris); font-size: 15px; margin: 14px 0 0; min-height: 22px; }
+
+  .tuiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 1060px; margin: 20px auto 0; }
+  .tuile { grid-column: span 2; border-radius: 28px; padding: 34px 32px; background: var(--tuile); border: 1px solid var(--filet); overflow: hidden; position: relative; }
+  .tuile.moitie { grid-column: span 3; }
+  .tuile .t { font-size: 24px; line-height: 1.17; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--blanc); }
+  .tuile p { margin: 0; color: var(--gris); font-size: 16px; }
+  .tuile .compteur { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -0.05em; margin: 0 0 10px; font-variant-numeric: tabular-nums; color: var(--blanc); }
+  .tuile .compteur::after { content: ""; display: inline-block; width: .16em; height: .16em; border-radius: 50%; background: var(--rose); margin-left: .05em; box-shadow: 0 0 16px var(--rose); }
+  .pastilles { display: flex; gap: 7px; margin-top: 18px; }
+  .pastilles i { width: 16px; height: 16px; border-radius: 5px; opacity: 0; transform: scale(.4); transition: opacity .4s, transform .4s cubic-bezier(.3,1.6,.5,1); }
+  .visible .pastilles i { opacity: 1; transform: none; }
+  .parties { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .parties span { font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 980px; color: #111; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .45s; }
+  .visible .parties span { opacity: 1; transform: none; }
+  .barre-lot { height: 10px; border-radius: 980px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 22px; }
+  .barre-lot i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--rose); box-shadow: 0 0 16px rgba(255,55,95,.7); }
+  .etat-lot { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; color: var(--gris); font-variant-numeric: tabular-nums; }
+  .etat-lot b { color: var(--blanc); }
+  .retour { position: absolute; right: 26px; top: 26px; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
+            background: rgba(255,55,95,.13); border: 1px solid rgba(255,55,95,.38); font-size: 24px; color: var(--rose); }
+  .visible .retour { animation: tourne 2.4s cubic-bezier(.6,0,.2,1) infinite; }
+  @keyframes tourne { 0%, 55% { transform: rotate(0); } 85%, 100% { transform: rotate(-360deg); } }
+  .boutons-grille { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .boutons-grille span { font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 980px; background: rgba(255,255,255,.1); color: var(--blanc); }
+
+  /* Installation */
+  .etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1060px; margin: 64px auto 0; }
+  .etape { border-radius: 24px; padding: 30px 26px; background: var(--tuile); border: 1px solid var(--filet); transition: transform .3s, border-color .3s; }
+  .etape:hover { transform: translateY(-4px); border-color: rgba(255,55,95,.4); }
+  .etape .n { font-size: 48px; font-weight: 800; line-height: 1; margin-bottom: 16px; color: var(--blanc); }
+  .etape .n::after { content: "."; color: var(--rose); }
+  .etape h3 { font-size: 20px; margin: 0 0 6px; letter-spacing: -0.015em; }
+  .etape p { margin: 0; color: var(--gris); font-size: 15px; line-height: 1.45; }
+  .remarque { max-width: 720px; margin: 34px auto 0; text-align: center; color: var(--faible); font-size: 14px; }
+
+  /* Fin */
+  .fin { text-align: center; overflow: hidden; }
+  .fin .halo { position: absolute; left: 50%; top: 50%; width: 900px; height: 520px; transform: translate(-50%, -50%); filter: blur(110px); opacity: .32; pointer-events: none;
+               background: radial-gradient(closest-side, var(--rose), transparent); animation: respire 7s ease-in-out infinite alternate; }
+  @keyframes respire { to { transform: translate(-50%, -50%) scale(1.15); opacity: .48; } }
+  .fin .grand-logo { position: relative; font-size: 64px; margin-bottom: 34px; }
+  .fin h2 { position: relative; font-size: 80px; }
+  .fin .chapo, .fin .actions { position: relative; }
+  footer { border-top: 1px solid var(--filet); color: var(--faible); font-size: 12px; line-height: 1.5; padding: 26px 22px 40px; }
+  footer .dedans { max-width: 980px; margin: 0 auto; }
+  footer .logo { font-size: 16px; margin-bottom: 14px; }
+  footer p { margin: 0 0 8px; }
+
+  /* Apparition au défilement */
+  .js .apparait { opacity: 0; transform: translateY(46px); transition: opacity 1.1s ease, transform 1.1s cubic-bezier(.2,.7,.2,1); }
+  .js .apparait.visible { opacity: 1; transform: none; }
+  .js .apparait.d1 { transition-delay: .12s; } .js .apparait.d2 { transition-delay: .24s; } .js .apparait.d3 { transition-delay: .36s; }
+  /* Le symbole se dessine à l'ouverture */
+  .js h1 .trace-masque { stroke-dashoffset: 1; animation: dessine 1.8s .25s cubic-bezier(.6,0,.2,1) forwards; }
+  @keyframes dessine { to { stroke-dashoffset: 0; } }
+  .js h1 .point { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: pop .5s 1.85s cubic-bezier(.3,1.8,.5,1) forwards; }
+  @keyframes pop { to { transform: scale(1); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .js .apparait { opacity: 1; transform: none; }
+    .js h1 .trace-masque { stroke-dashoffset: 0; } .js h1 .point { transform: none; }
+  }
+
+  /* Tablette */
+  @media (max-width: 1068px) {
+    h1 { font-size: 100px; } .slogan { font-size: 38px; } h2 { font-size: 56px; } .fin h2 { font-size: 60px; }
+    .copilote { grid-template-columns: 1fr 380px; gap: 50px; }
+    .etapes { grid-template-columns: repeat(2, 1fr); }
+    .tuile .t { font-size: 22px; }
+  }
+  /* Téléphone */
+  @media (max-width: 734px) {
+    nav .liens { display: none; }
+    .hero { padding: 104px 16px 40px; min-height: auto; }
+    h1 { font-size: 60px; } .slogan { font-size: 28px; } .chapo { font-size: 18px; }
+    .actions .cta, .actions .lien { font-size: 17px; }
+    .platine { margin-top: 46px; }
+    .lecture { grid-template-columns: 1fr auto; gap: 14px; padding: 18px; }
+    .bouton-lecture { display: none; }
+    .milieu-lecture canvas { height: 60px; }
+    .pastille-bpm { font-size: 16px; padding: 9px 12px; }
+    .suivant { margin: 0 18px; font-size: 16px; }
+    section { padding: 90px 16px; }
+    h2 { font-size: 40px; } .fin h2 { font-size: 42px; } .fin .grand-logo { font-size: 42px; }
+    .copilote { grid-template-columns: 1fr; gap: 50px; }
+    .copilote .texte h2, .copilote .texte .chapo { text-align: center; }
+    .demo { padding: 14px; border-radius: 22px; }
+    .demo canvas { height: 150px; }
+    .touche { min-width: 40px; height: 40px; font-size: 16px; }
+    .tuiles { grid-template-columns: 1fr; }
+    .tuile, .tuile.moitie { grid-column: span 1; padding: 28px 24px; }
+    .tuile .compteur { font-size: 84px; }
+    .etapes { grid-template-columns: 1fr; }
+  }
+</style>
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+<!-- Le symbole CAP DJ, en deux épaisseurs (fin pour les grandes tailles, épais pour les petites) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="symbole-fin" viewBox="{{VUE_FIN}}">{{SYMBOLE_FIN}}</symbol>
+  <symbol id="symbole-epais" viewBox="{{VUE_EPAIS}}">{{SYMBOLE_EPAIS}}</symbol>
+</svg>
+
+<nav>
+  <div class="dedans">
+    <a class="logo" href="#" aria-label="CAP DJ"><svg viewBox="{{VUE_EPAIS}}"><use href="#symbole-epais"/></svg><span class="mot"><b>CAP</b> <span>DJ</span></span></a>
+    <div class="liens">
+      <a href="#copilote">Copilote</a>
+      <a href="#points-cue">Points Cue</a>
+      <a href="#installation">Installation</a>
+    </div>
+    <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="lueur" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="hero-texte">
+    <p class="surtitre apparait"><i></i>Gratuit · pour Mac · version bêta</p>
+    <h1 class="apparait d1"><span class="logo" aria-label="CAP DJ">{{SYMBOLE_ANIME}}<span class="mot"><b>CAP</b> <span>DJ</span></span></span></h1>
+    <p class="slogan apparait d1">Le copilote <span class="rose">du DJ.</span></p>
+    <p class="chapo apparait d2">Le <strong>prochain morceau</strong>, chargé sur la platine en un clic. Des <strong>points Cue</strong> calés à la mesure près. Juste à côté de Serato DJ Pro.</p>
+    <div class="actions apparait d3">
+      <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Télécharger pour Mac
+      </a>
+      <a class="lien" href="#copilote">Voir comment ça marche ›</a>
+    </div>
+    <p class="petit apparait d3">par DJ Cap Niice · macOS 14 ou plus récent · Apple Silicon et Intel · Serato DJ Pro 4</p>
+  </div>
+
+  <div class="platine apparait d3">
+    <div class="fenetre">
+      <div class="barre"><i></i><i></i><i></i></div>
+      <div class="lecture">
+        <div class="bouton-lecture" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="#f5f5f7"/></svg></div>
+        <div class="milieu-lecture">
+          <div class="etiq">En cours <small id="titre-en-cours">Noite de Luanda · Kiala &amp; Mano Zé</small></div>
+          <canvas id="onde-hero" aria-label="Forme d'onde du morceau en cours qui défile, avec la tête de lecture rose"></canvas>
+        </div>
+        <div class="pastille-bpm" id="bpm-hero">124 BPM</div>
+      </div>
+      <div class="suivant">
+        <div class="nom" id="suivant-hero"><span>Titre suivant</span><b>Areia Branca</b><small>11A · 123 BPM</small></div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#a1a1a6"/></svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="copilote">
+  <div class="copilote">
+    <div class="texte">
+      <p class="etiquette apparait">Copilote</p>
+      <h2 class="apparait">Le prochain morceau.<br><span class="rose">Toujours prêt.</span></h2>
+      <p class="chapo apparait d1">CAP DJ suit ce que vous jouez et propose la suite, en accord avec la tonalité et le tempo. Il apprend de vos soirées : les enchaînements que vous aimez remontent en premier.</p>
+      <ul class="avantages">
+        <li class="apparait d1"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff375f" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="12" r="5"/><circle cx="18" cy="12" r="3"/></svg></span><span><b>Platines 1 et 2</b>Un clic, et le morceau se charge dans Serato.</span></li>
+        <li class="apparait d2"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff375f" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><span><b>Votre bibliothèque, telle quelle</b>Vos morceaux, vos bacs et votre historique. Rien à importer.</span></li>
+        <li class="apparait d3"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff375f" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg></span><span><b>À découvrir</b>Des titres Apple Music jamais joués, proposés à part.</span></li>
+      </ul>
+    </div>
+    <div class="scene apparait d1">
+      <div class="panneau" id="panneau">
+        <div class="onglets"><span class="actif">Mes sons</span><span>À découvrir</span></div>
+        <div class="en-cours">
+          <div class="cle-m" id="pc-cle">11A</div>
+          <div class="infos" id="pc-infos"><div class="titre-m" id="pc-titre">Noite de Luanda</div><div class="artiste-m" id="pc-artiste">Kiala &amp; Mano Zé</div></div>
+          <div class="bpm-m"><span id="pc-bpm">124</span><small>BPM</small></div>
+        </div>
+        <ul class="liste" id="pc-liste"></ul>
+        <div class="toast" id="pc-toast"><i>●</i> Chargé sur la platine 1</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="points-cue" style="background: linear-gradient(180deg, #000, #070708 30%, #000);">
+  <div class="centre">
+    <p class="etiquette apparait">Points Cue</p>
+    <h2 class="apparait">Vos Cue,<br><span class="rose">à la mesure près.</span></h2>
+    <p class="chapo apparait d1">CAP DJ repère la structure de chaque morceau et place les Cue là où ça compte. Vous écoutez, vous ajustez au clavier, vous validez.</p>
+  </div>
+
+  <div class="demo apparait d1">
+    <canvas id="onde-cue" aria-label="Démonstration : des points Cue avancent mesure par mesure jusqu'au bon endroit, puis sont validés"></canvas>
+    <div class="clavier" aria-hidden="true">
+      <span class="touche" id="t-gauche">←</span><span class="touche" id="t-droite">→</span>
+      <span class="sep"></span><span class="touche" id="t-option">⌥</span><span class="touche" id="t-espace" style="min-width:120px">espace</span>
+      <span class="sep"></span><span class="touche" id="t-entree">↩︎</span>
+    </div>
+    <p class="legende" id="legende">→ une mesure plus tard · espace pour écouter · ↩︎ pour valider</p>
+  </div>
+
+  <div class="tuiles">
+    <div class="tuile apparait">
+      <p class="compteur" data-jusqua="8">0</p>
+      <p class="t">Cue par morceau.</p>
+      <p>Vos propres Cue restent à leur place. CAP DJ remplit les emplacements libres.</p>
+      <div class="pastilles">
+        <i style="background:#cc0000;transition-delay:.1s"></i><i style="background:#cccc00;transition-delay:.18s"></i><i style="background:#00cc00;transition-delay:.26s"></i><i style="background:#00cccc;transition-delay:.34s"></i>
+        <i style="background:#0000cc;transition-delay:.42s"></i><i style="background:#cc00cc;transition-delay:.5s"></i><i style="background:#cc8800;transition-delay:.58s"></i><i style="background:#88cc00;transition-delay:.66s"></i>
+      </div>
+    </div>
+    <div class="tuile apparait d1">
+      <p class="t">La structure, repérée pour vous.</p>
+      <p>Chaque partie a sa couleur, comme dans Serato.</p>
+      <div class="parties">
+        <span style="background:#ff4d4d;transition-delay:.1s">Intro</span><span style="background:#e6e64d;transition-delay:.2s">Couplet</span>
+        <span style="background:#e64de6;transition-delay:.3s">Montée</span><span style="background:#4de64d;transition-delay:.4s">Refrain</span>
+        <span style="background:#4de6e6;transition-delay:.5s">Break</span><span style="background:#ffaa33;transition-delay:.6s">Pont</span><span style="background:#6b6bff;transition-delay:.7s;color:#fff">Outro</span>
+      </div>
+    </div>
+    <div class="tuile apparait d2">
+      <span class="retour" aria-hidden="true">↺</span>
+      <p class="t" style="padding-right:66px">Rien n'est définitif.</p>
+      <p>Chaque fichier est sauvegardé avant d'être modifié. « Remettre comme avant » le rend exactement tel qu'il était.</p>
+    </div>
+    <div class="tuile moitie apparait">
+      <p class="t">Un dossier entier, en une fois.</p>
+      <p>Validez une sélection, un bac ou toute votre bibliothèque. Les morceaux déjà calés ne sont jamais retouchés.</p>
+      <div class="barre-lot"><i id="lot-barre"></i></div>
+      <div class="etat-lot"><span id="lot-texte">Validation…</span><b id="lot-compte">0 / 640</b></div>
+    </div>
+    <div class="tuile moitie apparait d1">
+      <p class="t">Même sans grille Serato.</p>
+      <p>Un morceau jamais analysé ? CAP DJ trouve lui-même le tempo et les temps à partir du son, et vous laisse corriger d'un clic.</p>
+      <div class="boutons-grille"><span>÷ 2</span><span>× 2</span><span>‹ ›</span><span>+1 temps</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="centre">
+    <p class="etiquette apparait">Installation</p>
+    <h2 class="apparait">Prêt en <span class="rose">deux minutes.</span></h2>
+    <p class="chapo apparait d1">Gratuit, sans compte et sans abonnement. CAP DJ ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
+  </div>
+  <div class="etapes">
+    <div class="etape apparait"><div class="n">1</div><h3>Téléchargez</h3><p>Ouvrez <b>CapDJ.dmg</b> et glissez CAP DJ dans le dossier Applications.</p></div>
+    <div class="etape apparait d1"><div class="n">2</div><h3>Ouvrez</h3><p>Lancez CAP DJ. Si macOS dit qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
+    <div class="etape apparait d2"><div class="n">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : « Ouvrir quand même ». Une seule fois.</p></div>
+    <div class="etape apparait d3"><div class="n">4</div><h3>Jouez</h3><p>Dans CAP DJ, « Autoriser », puis activez-le dans Accessibilité pour charger sur les platines.</p></div>
+  </div>
+  <p class="remarque apparait">CAP DJ n'est pas encore signé par Apple, d'où l'étape 3. Il faut macOS 14 ou plus récent et Serato DJ Pro 4.</p>
+</section>
+
+<section class="fin">
+  <div class="halo" aria-hidden="true"></div>
+  <div class="grand-logo apparait"><span class="logo" aria-label="CAP DJ"><svg viewBox="{{VUE_FIN}}"><use href="#symbole-fin"/></svg><span class="mot"><b>CAP</b> <span>DJ</span></span></span></div>
+  <h2 class="apparait">Gratuit.<br><span class="rose">Pour tous les DJ.</span></h2>
+  <p class="chapo apparait d1">Fait par un DJ, pour les DJ.</p>
+  <div class="actions apparait d2">
+    <a class="cta" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">Télécharger pour Mac</a>
+    <a class="lien" href="https://github.com/djcapniice/capdj/releases">Toutes les versions ›</a>
+  </div>
+</section>
+
+<footer>
+  <div class="dedans">
+    <span class="logo"><svg viewBox="{{VUE_EPAIS}}"><use href="#symbole-epais"/></svg><span class="mot"><b>CAP</b> <span>DJ</span></span></span>
+    <p>CAP DJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited. Apple Music, Mac et macOS sont des marques d'Apple Inc. Les morceaux montrés sur cette page sont fictifs.</p>
+    <p>CAP DJ © 2026 DJ Cap Niice. Gratuit pour un usage personnel.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Apparitions au défilement ----------
+  var blocs = document.querySelectorAll('.apparait, .tuile');
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    blocs.forEach(function (b) { obs.observe(b); });
+  } else { blocs.forEach(function (b) { b.classList.add('visible'); }); }
+
+  // ---------- Outils ----------
+  function preparer(c) {
+    var r = c.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.max(1, Math.round(r.width * d)); c.height = Math.max(1, Math.round(r.height * d));
+    var x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0);
+    return { x: x, w: r.width, h: r.height };
+  }
+  function bruit(n) { var s = Math.sin(n * 127.1 + 11.7) * 43758.5453; return s - Math.floor(s); }
+  function surEcran(el, rappel) {
+    if (!('IntersectionObserver' in window)) { rappel(true); return; }
+    new IntersectionObserver(function (es) { rappel(es[0].isIntersecting); }, { threshold: 0 }).observe(el);
+  }
+  // Un morceau imaginaire, temps par temps : grosse caisse (basses), caisse claire et voix (médiums), charleston (aigus).
+  function section(mesure) {
+    var s = ((mesure % 64) + 64) % 64;
+    if (s < 8) return { e: .62, kick: 1 };
+    if (s < 24) return { e: .82, kick: 1 };
+    if (s < 28) return { e: .55, kick: 0 };
+    if (s < 32) return { e: .78, kick: 1 };
+    if (s < 56) return { e: 1, kick: 1 };
+    return { e: .68, kick: 1 };
+  }
+  function son(b) {
+    var t = Math.floor(b), ph = b - t, S = section(Math.floor(t / 4));
+    var kick = S.kick ? Math.exp(-ph * 6.2) : 0;
+    var claire = (t % 2 === 1) ? Math.exp(-ph * 8) : 0;
+    var charley = Math.exp(-Math.abs(ph - .5) * 24) + .35 * Math.exp(-Math.abs(ph - .25) * 36) + .35 * Math.exp(-Math.abs(ph - .75) * 36);
+    var grain = bruit(Math.floor(b * 64)) * .14;
+    var corps = .30 + .10 * Math.sin(b * .8) + grain;
+    return { l: (kick * .95 + .05) * S.e, m: (corps + claire * .45) * S.e, h: (charley * .5 + grain) * S.e };
+  }
+  function colonne(v) {
+    var r = v.l, g = v.m * .92, bl = v.h, m = Math.max(r, g, bl) || 1;
+    var amp = Math.min(1, Math.sqrt(r * r + g * g + bl * bl) * .9), ec = .55 + .45 * amp;
+    return { c: 'rgb(' + Math.round(255 * r / m * ec) + ',' + Math.round(255 * g / m * ec) + ',' + Math.round(255 * bl / m * ec) + ')', a: Math.pow(amp, .8) };
+  }
+  var couleursCue = ['#ff3b30', '#ffd60a', '#30d1d1', '#bf5af2', '#30d158', '#4a5bff'];
+
+  // ---------- Ouverture : la platine de la charte, onde grise et tête de lecture rose ----------
+  (function () {
+    var c = document.getElementById('onde-hero'); if (!c) return;
+    var g = preparer(c), actif = true, depart = performance.now(), bpm = 124, pxTemps = 34, pasBarre = 5;
+    window.addEventListener('resize', function () { g = preparer(c); if (calme) dessiner(40); });
+    surEcran(c, function (v) { actif = v; });
+    var suivants = [['Areia Branca', '11A', 123], ['Kuduro do Bairro', '12A', 125], ['Sol de Abidjan', '10A', 122], ['Maré Alta', '12A', 126], ['Lumière d\'Accra', '11B', 124]];
+    var iS = 0, derniere = -1, nom = document.getElementById('suivant-hero');
+    function changer() {
+      iS = (iS + 1) % suivants.length; var s = suivants[iS];
+      nom.classList.add('change');
+      setTimeout(function () { nom.innerHTML = '<span>Titre suivant</span><b>' + s[0] + '</b><small>' + s[1] + ' · ' + s[2] + ' BPM</small>'; nom.classList.remove('change'); }, 450);
+    }
+    function dessiner(pos) {
+      var x = g.x, w = g.w, h = g.h, mi = h / 2, tete = w * .58;
+      x.clearRect(0, 0, w, h);
+      var decal = ((pos * pxTemps) % pasBarre);
+      for (var px = -decal; px < w; px += pasBarre) {
+        var b = pos + (px - tete) / pxTemps, v = son(b);
+        var amp = Math.min(1, Math.sqrt(v.l * v.l + v.m * v.m + v.h * v.h) * .85);
+        var hh = Math.max(2, Math.pow(amp, .9) * (h - 8));
+        var avant = px < tete;
+        x.fillStyle = avant ? 'rgba(245,245,247,.92)' : 'rgba(161,161,166,.55)';
+        var l = 2.6, y = mi - hh / 2;
+        x.beginPath(); if (x.roundRect) x.roundRect(px, y, l, hh, 1.3); else x.rect(px, y, l, hh); x.fill();
+      }
+      // tête de lecture rose, avec son point (comme le symbole)
+      x.fillStyle = '#ff375f';
+      x.fillRect(Math.round(tete) - 1, 8, 2, h - 8);
+      x.save(); x.shadowColor = 'rgba(255,55,95,.9)'; x.shadowBlur = 12;
+      x.beginPath(); x.arc(tete, 7, 6, 0, Math.PI * 2); x.fill(); x.restore();
+      var mes = Math.floor(pos / 16);
+      if (mes !== derniere) { if (derniere >= 0) changer(); derniere = mes; }
+    }
+    if (calme) { dessiner(40); return; }
+    (function boucle(now) { if (actif) dessiner(28 + (now - depart) / 1000 * bpm / 60); requestAnimationFrame(boucle); })(performance.now());
+  })();
+
+  // ---------- Copilote animé ----------
+  (function () {
+    var morceaux = [
+      ['Noite de Luanda', 'Kiala & Mano Zé', 124, 11, 'A'], ['Areia Branca', 'Dona Lu', 123, 11, 'A'], ['Kuduro do Bairro', 'DJ Mabanza', 125, 12, 'A'],
+      ['Sol de Abidjan', 'Awa Koné', 122, 10, 'A'], ['Tarraxo Lento', 'Neto Silva', 124, 11, 'B'], ['Maré Alta', 'Yuri K.', 126, 12, 'A'],
+      ['Coração Quente', 'Lina Mbaye', 123, 10, 'A'], ['Lumière d\'Accra', 'Ama Mensah', 124, 11, 'B'], ['Kizomba da Ilha', 'Edu Tavares', 122, 1, 'A'],
+      ['Batida Fina', 'Rui Mendes', 125, 12, 'B']
+    ];
+    function fond(m) { return 'hsl(' + (((m[3] - 1) * 30 + 165) % 360) + ',100%,70%)'; }
+    var liste = document.getElementById('pc-liste'), toast = document.getElementById('pc-toast');
+    var cle = document.getElementById('pc-cle'), infos = document.getElementById('pc-infos');
+    var titre = document.getElementById('pc-titre'), artiste = document.getElementById('pc-artiste'), bpmEl = document.getElementById('pc-bpm');
+    var courant = 0, actif = false, panneau = document.getElementById('panneau');
+    function rendreListe() {
+      liste.innerHTML = '';
+      for (var i = 1; i <= 4; i++) {
+        var m = morceaux[(courant + i) % morceaux.length];
+        var li = document.createElement('li'); li.className = 'ligne'; li.style.animationDelay = (i * 0.08) + 's';
+        li.innerHTML = '<div class="cle-m" style="background:' + fond(m) + '">' + m[3] + m[4] + '</div><div class="infos"><div class="titre-m">' + m[0] +
+          '</div><div class="artiste-m">' + m[1] + (i % 2 ? ' · même ton' : '') + '</div></div><span class="bpm">' + m[2] + '</span><span class="deck">1</span><span class="deck">2</span>';
+        liste.appendChild(li);
+      }
+    }
+    function rendreCourant() {
+      var m = morceaux[courant];
+      cle.textContent = m[3] + m[4]; cle.style.background = fond(m);
+      titre.textContent = m[0]; artiste.textContent = m[1]; bpmEl.textContent = m[2];
+    }
+    rendreCourant(); rendreListe();
+    if (calme) return;
+    surEcran(panneau, function (v) { actif = v; });
+    setInterval(function () {
+      if (!actif) return;
+      var ligne = liste.firstElementChild; if (!ligne) return;
+      ligne.classList.add('choisie');
+      var bouton = ligne.querySelectorAll('.deck')[0];
+      setTimeout(function () { bouton.classList.add('presse'); }, 450);
+      setTimeout(function () {
+        toast.classList.add('vu'); infos.classList.add('change');
+        setTimeout(function () { courant = (courant + 1) % morceaux.length; rendreCourant(); infos.classList.remove('change'); rendreListe(); }, 350);
+      }, 900);
+      setTimeout(function () { toast.classList.remove('vu'); }, 2300);
+    }, 3600);
+    function incliner() {
+      var r = panneau.getBoundingClientRect(), vh = window.innerHeight;
+      var p = Math.min(1, Math.max(0, (vh - r.top) / (vh * .75)));
+      panneau.style.transform = 'rotateX(' + (18 * (1 - p)).toFixed(2) + 'deg) scale(' + (.9 + .1 * p).toFixed(3) + ')';
+    }
+    window.addEventListener('scroll', incliner, { passive: true }); incliner();
+  })();
+
+  // ---------- Démonstration Points Cue (onde en couleurs, comme dans l'app) ----------
+  (function () {
+    var c = document.getElementById('onde-cue'); if (!c) return;
+    var g = preparer(c), fondOnde = null, actif = false, totalMesures = 64;
+    var touches = { '←': document.getElementById('t-gauche'), '→': document.getElementById('t-droite'), '↩': document.getElementById('t-entree'), 'espace': document.getElementById('t-espace') };
+    var legende = document.getElementById('legende');
+    var cibles = [0, 8, 24, 32, 56], decalages = [0, 2, -2, 3, -1];
+    var cues = [], k = 0, tete = -1;
+    function initialiser() { cues = cibles.map(function (m, i) { return { m: m + decalages[i], cible: m, ok: i === 0 }; }); k = 1; }
+    function fabriquerFond() {
+      var cv = document.createElement('canvas'), d = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(g.w * d); cv.height = Math.round(g.h * d);
+      var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0);
+      var mi = g.h / 2, tpp = totalMesures * 4 / g.w;
+      for (var px = 0; px < g.w; px++) {
+        var l = 0, m = 0, h = 0;
+        for (var s = 0; s < 6; s++) { var v = son(px * tpp + s * tpp / 6); l = Math.max(l, v.l); m = Math.max(m, v.m); h = Math.max(h, v.h); }
+        var col = colonne({ l: l, m: m, h: h }), dd = Math.max(.5, col.a * (mi - 20));
+        x.fillStyle = col.c; x.fillRect(px, mi - dd + 6, 1.05, 2 * dd - 6);
+      }
+      for (var mes = 0; mes <= totalMesures; mes += 4) { x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(Math.round(mes / totalMesures * g.w), 0, .6, g.h); }
+      fondOnde = cv;
+    }
+    function appuyer(nom) { var t = touches[nom]; if (!t) return; t.classList.add('appuyee'); setTimeout(function () { t.classList.remove('appuyee'); }, 220); }
+    function dessiner(puls) {
+      var x = g.x, w = g.w, h = g.h;
+      x.clearRect(0, 0, w, h);
+      if (fondOnde) x.drawImage(fondOnde, 0, 0, w, h);
+      if (tete >= 0) { var tx = tete / totalMesures * w; x.fillStyle = '#ff375f'; x.fillRect(tx, 0, 2, h); }
+      cues.forEach(function (q, i) {
+        var cx = q.m / totalMesures * w, col = couleursCue[i], enCours = i === k && !q.ok;
+        x.globalAlpha = i > k && !q.ok ? .35 : 1;
+        if (enCours) { x.save(); x.shadowColor = col; x.shadowBlur = 12 + 8 * puls; }
+        x.fillStyle = col; x.fillRect(Math.round(cx), 0, enCours ? 2 : 1.5, h);
+        x.beginPath(); if (x.roundRect) x.roundRect(cx, 0, q.ok ? 30 : 20, 18, 3); else x.rect(cx, 0, 20, 18); x.fill();
+        if (enCours) x.restore();
+        x.fillStyle = '#fff'; x.font = '700 11px -apple-system, Helvetica, Arial'; x.textBaseline = 'middle';
+        x.fillText(String(i + 1) + (q.ok ? ' ✓' : ''), cx + 6, 9.5);
+        x.globalAlpha = 1;
+      });
+    }
+    initialiser(); fabriquerFond(); dessiner(0);
+    window.addEventListener('resize', function () { g = preparer(c); fabriquerFond(); dessiner(0); });
+    if (calme) { cues.forEach(function (q) { q.m = q.cible; q.ok = true; }); dessiner(0); return; }
+    surEcran(c, function (v) { actif = v; });
+    var prochain = 0, attente = 0, ecoute = 0;
+    (function boucle(now) {
+      requestAnimationFrame(boucle);
+      if (!actif) return;
+      var puls = (Math.sin(now / 180) + 1) / 2;
+      if (tete >= 0) { tete += 0.035; if (tete > ecoute + 3) tete = -1; }
+      if (now >= prochain) {
+        if (k >= cues.length) {
+          if (!attente) { attente = now + 2200; legende.textContent = 'Tous les Cue sont calés. Il ne reste qu\'à les écrire dans le fichier.'; }
+          if (now >= attente) { attente = 0; initialiser(); legende.textContent = '→ une mesure plus tard · espace pour écouter · ↩︎ pour valider'; }
+          prochain = now + 400;
+        } else {
+          var q = cues[k];
+          if (q.m !== q.cible) {
+            var sens = q.cible > q.m ? 1 : -1; q.m += sens; appuyer(sens > 0 ? '→' : '←');
+            legende.textContent = sens > 0 ? '→ une mesure plus tard' : '← une mesure plus tôt';
+            prochain = now + 520;
+          } else if (tete < 0 && ecoute !== q.m) {
+            ecoute = q.m; tete = q.m; appuyer('espace'); legende.textContent = 'espace : on écoute depuis le Cue… pile sur le temps.';
+            prochain = now + 1300;
+          } else {
+            q.ok = true; appuyer('↩'); legende.textContent = '↩︎ validé. Cue suivant.'; k++; prochain = now + 900;
+          }
+        }
+      }
+      dessiner(puls);
+    })(performance.now());
+  })();
+
+  // ---------- Tuiles : compteur et validation par lots ----------
+  (function () {
+    var compteur = document.querySelector('.compteur');
+    var barre = document.getElementById('lot-barre'), compte = document.getElementById('lot-compte'), texte = document.getElementById('lot-texte');
+    function compterJusqua(el, n) { if (calme) { el.textContent = n; return; } var i = 0; var t = setInterval(function () { el.textContent = ++i; if (i >= n) clearInterval(t); }, 110); }
+    function lot() {
+      if (calme) { barre.style.width = '100%'; compte.textContent = '640 / 640'; texte.textContent = '✓ Validation terminée'; return; }
+      var total = 640, debut = performance.now(), duree = 4200;
+      (function pas(now) {
+        var p = Math.min(1, (now - debut) / duree), e = 1 - Math.pow(1 - p, 2);
+        barre.style.width = (e * 100) + '%'; compte.textContent = Math.round(e * total) + ' / ' + total;
+        texte.textContent = p < 1 ? 'Validation…' : '✓ Validation terminée';
+        if (p < 1) requestAnimationFrame(pas); else setTimeout(function () { debut = performance.now(); requestAnimationFrame(pas); }, 2600);
+      })(debut);
+    }
+    if (!('IntersectionObserver' in window)) { compterJusqua(compteur, 8); lot(); return; }
+    new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { compterJusqua(compteur, 8); o.disconnect(); } }, { threshold: .4 }).observe(compteur);
+    new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { lot(); o.disconnect(); } }, { threshold: .4 }).observe(barre);
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,6 @@
-# CapDJ — le copilote du DJ
+![CAP DJ — le copilote du DJ](docs/partage.png)
+
+# CAP DJ — le copilote du DJ
 
 **Par DJ Cap Niice · gratuit · version bêta**
 
