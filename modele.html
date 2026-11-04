@@ -9,6 +9,9 @@
 <meta property="og:title" content="CAP DJ — le copilote du DJ">
 <meta property="og:description" content="Le prochain morceau, chargé en un clic. Des points Cue calés à la mesure près. Gratuit, pour Mac.">
 <meta property="og:image" content="https://djcapniice.github.io/capdj/partage.png">
+<meta property="og:url" content="https://djcapniice.github.io/capdj/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -19,7 +22,7 @@
     --police: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
-  html { background: var(--noir); }
+  html { background: var(--noir); overflow-x: clip; }
   body { margin: 0; background: var(--noir); color: var(--blanc); font: 17px/1.47 var(--police); letter-spacing: -0.022em;
          -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   a { color: var(--rose); text-decoration: none; }
@@ -81,11 +84,12 @@
   .fenetre .barre { height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,.07); }
   .fenetre .barre i { width: 12px; height: 12px; border-radius: 50%; }
   .fenetre .barre i:nth-child(1) { background: #ff5f57; } .fenetre .barre i:nth-child(2) { background: #febc2e; } .fenetre .barre i:nth-child(3) { background: #28c840; }
-  .lecture { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 24px; padding: 26px 28px 22px; }
+  .lecture { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 26px 28px 22px; }
   .bouton-lecture { width: 76px; height: 64px; border-radius: 14px; background: #2c2c2e; display: grid; place-items: center; }
   .bouton-lecture svg { width: 26px; height: 26px; }
-  .milieu-lecture .etiq { font-size: 19px; font-weight: 600; margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
-  .milieu-lecture .etiq small { font-size: 14px; color: var(--gris); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .milieu-lecture { min-width: 0; }
+  .milieu-lecture .etiq { font-size: 19px; font-weight: 600; margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; white-space: nowrap; min-width: 0; }
+  .milieu-lecture .etiq small { min-width: 0; font-size: 14px; color: var(--gris); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .milieu-lecture canvas { display: block; width: 100%; height: 78px; }
   .pastille-bpm { font-size: 20px; font-weight: 700; padding: 12px 18px; border-radius: 12px; background: #2c2c2e; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .suivant { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 28px; padding: 18px 0 22px; border-top: 1px solid rgba(255,255,255,.1); font-size: 18px; }
@@ -172,7 +176,7 @@
   .barre-lot i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--rose); box-shadow: 0 0 16px rgba(255,55,95,.7); }
   .etat-lot { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; color: var(--gris); font-variant-numeric: tabular-nums; }
   .etat-lot b { color: var(--blanc); }
-  .retour { position: absolute; right: 26px; top: 26px; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
+  .retour { float: right; margin: -4px -4px 12px 16px; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
             background: rgba(255,55,95,.13); border: 1px solid rgba(255,55,95,.38); font-size: 24px; color: var(--rose); }
   .visible .retour { animation: tourne 2.4s cubic-bezier(.6,0,.2,1) infinite; }
   @keyframes tourne { 0%, 55% { transform: rotate(0); } 85%, 100% { transform: rotate(-360deg); } }
@@ -232,7 +236,7 @@
     h1 { font-size: 60px; } .slogan { font-size: 28px; } .chapo { font-size: 18px; }
     .actions .cta, .actions .lien { font-size: 17px; }
     .platine { margin-top: 46px; }
-    .lecture { grid-template-columns: 1fr auto; gap: 14px; padding: 18px; }
+    .lecture { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 18px; }
     .bouton-lecture { display: none; }
     .milieu-lecture canvas { height: 60px; }
     .pastille-bpm { font-size: 16px; padding: 9px 12px; }
@@ -373,7 +377,7 @@
     </div>
     <div class="tuile apparait d2">
       <span class="retour" aria-hidden="true">↺</span>
-      <p class="t" style="padding-right:66px">Rien n'est définitif.</p>
+      <p class="t">Rien n'est définitif.</p>
       <p>Chaque fichier est sauvegardé avant d'être modifié. « Remettre comme avant » le rend exactement tel qu'il était.</p>
     </div>
     <div class="tuile moitie apparait">
@@ -397,10 +401,10 @@
     <p class="chapo apparait d1">Gratuit, sans compte et sans abonnement. CAP DJ ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
   </div>
   <div class="etapes">
-    <div class="etape apparait"><div class="n">1</div><h3>Téléchargez</h3><p>Ouvrez <b>CapDJ.dmg</b> et glissez CAP DJ dans le dossier Applications.</p></div>
-    <div class="etape apparait d1"><div class="n">2</div><h3>Ouvrez</h3><p>Lancez CAP DJ. Si macOS dit qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
-    <div class="etape apparait d2"><div class="n">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : « Ouvrir quand même ». Une seule fois.</p></div>
-    <div class="etape apparait d3"><div class="n">4</div><h3>Jouez</h3><p>Dans CAP DJ, « Autoriser », puis activez-le dans Accessibilité pour charger sur les platines.</p></div>
+    <div class="etape apparait"><div class="n">1</div><h3>Téléchargez</h3><p>Ouvrez <b>CapDJ.dmg</b> et glissez CapDJ dans le dossier Applications.</p></div>
+    <div class="etape apparait d1"><div class="n">2</div><h3>Ouvrez</h3><p>Lancez CapDJ. Si macOS dit qu'il ne peut pas vérifier l'app, cliquez sur « Terminé ».</p></div>
+    <div class="etape apparait d2"><div class="n">3</div><h3>Autorisez</h3><p>Réglages Système › Confidentialité et sécurité : « Ouvrir quand même » à côté de CapDJ. Une seule fois.</p></div>
+    <div class="etape apparait d3"><div class="n">4</div><h3>Jouez</h3><p>Dans CapDJ, « Autoriser », puis activez CapDJ dans Accessibilité pour charger sur les platines.</p></div>
   </div>
   <p class="remarque apparait">CAP DJ n'est pas encore signé par Apple, d'où l'étape 3. Il faut macOS 14 ou plus récent et Serato DJ Pro 4.</p>
 </section>
