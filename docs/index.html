@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CapDJ — le copilote du DJ</title>
+<meta name="description" content="CapDJ, le copilote du DJ pour Mac, par DJ Cap Niice : le prochain morceau à jouer, chargé sur la platine en un clic, et des points Cue calés selon la structure de vos morceaux. Gratuit.">
+<style>
+  :root {
+    --fond: #0d0d10; --carte: #17171c; --filet: #26262d; --texte: #f2f2f5; --doux: #a3a3ad;
+    --accent: #ff9f0a; --accent-fonce: #cc7a00;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fond); color: var(--texte);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  main { max-width: 920px; margin: 0 auto; padding: 56px 16px 72px; }
+  header { text-align: center; }
+  .logo { font-size: 56px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
+  .logo span { color: var(--accent); }
+  .accroche { font-size: 22px; margin: 6px 0 4px; }
+  .signature { color: var(--doux); margin: 0 0 28px; }
+  .bouton {
+    display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #111;
+    font-weight: 700; font-size: 18px; padding: 15px 28px; border-radius: 999px; text-decoration: none;
+  }
+  .bouton:hover { background: #ffb340; }
+  .info { color: var(--doux); font-size: 14px; margin-top: 12px; }
+  figure { margin: 40px 0 0; }
+  figure img { width: 100%; border-radius: 14px; border: 1px solid var(--filet); display: block; }
+  figcaption { color: var(--doux); font-size: 14px; text-align: center; margin-top: 10px; }
+  h2 { font-size: 26px; margin: 56px 0 18px; }
+  .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .carte { background: var(--carte); border: 1px solid var(--filet); border-radius: 14px; padding: 18px 20px; }
+  .carte h3 { margin: 0 0 6px; font-size: 17px; }
+  .carte p { margin: 0; color: var(--doux); font-size: 15px; }
+  ol { padding-left: 22px; }
+  ol li { margin: 8px 0; }
+  code, .touche { background: var(--carte); border: 1px solid var(--filet); border-radius: 6px; padding: 1px 6px; font-size: 14px; }
+  .note { background: var(--carte); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 16px; color: var(--doux); }
+  footer { margin-top: 64px; color: var(--doux); font-size: 13px; text-align: center; }
+  footer a { color: var(--doux); }
+  @media (max-width: 520px) { .logo { font-size: 44px; } .accroche { font-size: 19px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="logo">Cap<span>DJ</span></p>
+    <p class="accroche">Le copilote du DJ, à côté de Serato DJ Pro.</p>
+    <p class="signature">par DJ Cap Niice · gratuit · version bêta</p>
+    <a class="bouton" href="https://github.com/djcapniice/capdj/releases/latest/download/CapDJ.dmg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      Télécharger pour Mac
+    </a>
+    <p class="info">macOS 14 ou plus récent · Mac Apple Silicon ou Intel · Serato DJ Pro 4</p>
+  </header>
+
+  <figure>
+    <img src="onde.png" alt="La forme d'onde de CapDJ, avec la grille des temps et les points Cue numérotés">
+    <figcaption>Points Cue : la forme d'onde en couleurs, la grille des temps et vos Cue, calés à l'oreille.</figcaption>
+  </figure>
+
+  <h2>Ce que fait CapDJ</h2>
+  <div class="grille">
+    <div class="carte"><h3>Le prochain morceau</h3><p>CapDJ suit ce que vous jouez et propose la suite, à partir de votre bibliothèque, de vos bacs et de vos habitudes de soirée.</p></div>
+    <div class="carte"><h3>Sur la platine en un clic</h3><p>Boutons 1 et 2 : le morceau choisi se charge directement sur la platine de Serato.</p></div>
+    <div class="carte"><h3>À découvrir</h3><p>Des titres Apple Music que vous n'avez encore jamais joués, proposés à part.</p></div>
+    <div class="carte"><h3>Points Cue</h3><p>Des Cue placés selon la structure du morceau (intro, couplet, refrain…). Vous écoutez, vous décalez d'une mesure au clavier, vous validez.</p></div>
+    <div class="carte"><h3>Par lots</h3><p>Validez un dossier, un bac ou une sélection en une fois. Vos propres Cue sont gardés, et « Remettre comme avant » reste toujours possible.</p></div>
+    <div class="carte"><h3>Rien à importer</h3><p>CapDJ lit votre bibliothèque Serato telle quelle, sans jamais modifier sa base de données.</p></div>
+  </div>
+
+  <h2>Installation</h2>
+  <ol>
+    <li>Ouvrez <strong>CapDJ.dmg</strong> et glissez CapDJ dans le dossier Applications.</li>
+    <li>Ouvrez CapDJ. macOS indique qu'il ne peut pas vérifier l'app : cliquez sur « Terminé ».</li>
+    <li>Allez dans <strong>Réglages Système › Confidentialité et sécurité</strong>. En bas, à côté de « CapDJ a été bloqué », cliquez sur <strong>« Ouvrir quand même »</strong>. Cette étape ne se fait qu'une fois.</li>
+    <li>Dans CapDJ, cliquez sur « Autoriser », puis activez CapDJ dans <strong>Confidentialité et sécurité › Accessibilité</strong>. C'est ce qui permet de charger les morceaux sur les platines.</li>
+  </ol>
+  <p class="note">CapDJ n'est pas encore signé par Apple, d'où l'étape « Ouvrir quand même ». L'app ne s'installe que sur votre Mac et n'envoie rien sur Internet.</p>
+
+  <footer>
+    <p>CapDJ © 2026 DJ Cap Niice. Gratuit pour un usage personnel.</p>
+    <p>CapDJ est un outil indépendant, compatible Serato DJ Pro. Il n'est ni affilié à Serato ni approuvé par Serato. Serato est une marque de Serato Limited.</p>
+  </footer>
+</main>
+</body>
+</html>
